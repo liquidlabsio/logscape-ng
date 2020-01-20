@@ -17,7 +17,7 @@ public class UploaderResource {
     String cloudRegion;
 
     @ConfigProperty(name = "storage.uploader")
-    StorageUploader uploader;
+    Storage uploader;
 
     @ConfigProperty(name = "storage.indexer")
     StorageIndexer indexer;

@@ -1,6 +1,6 @@
 package com.logscapeng.uploader;
 
-public interface StorageUploader {
+public interface Storage {
     /**
      * Store and Capture the Storage URL
      * @param upload

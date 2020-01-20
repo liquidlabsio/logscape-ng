@@ -1,11 +1,12 @@
 package com.logscapeng.uploader.fixture;
 
-import com.logscapeng.uploader.StorageUploader;
+import com.logscapeng.uploader.Storage;
 import org.eclipse.microprofile.config.spi.Converter;
 
-public class FixturedStorageConverter implements Converter<StorageUploader> {
+public class FixturedStorageConverter implements Converter<Storage> {
+
     @Override
-    public StorageUploader convert(String s) {
-        return new FixturedUploaderService();
+    public Storage convert(String s) {
+        return new FixturedStorageService();
     }
 }

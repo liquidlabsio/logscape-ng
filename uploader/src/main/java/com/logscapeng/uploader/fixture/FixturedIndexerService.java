@@ -2,8 +2,17 @@ package com.logscapeng.uploader.fixture;
 
 import com.logscapeng.uploader.FileMeta;
 import com.logscapeng.uploader.StorageIndexer;
+import com.logscapeng.uploader.aws.AwsFileMetaDataQueryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FixturedIndexerService implements StorageIndexer {
+
+    private final Logger log = LoggerFactory.getLogger(FixturedIndexerService.class);
+
+    public FixturedIndexerService(){
+        log.info("Created");
+    }
     @Override
     public FileMeta enrichMeta(FileMeta fileMeta) {
         return fileMeta;

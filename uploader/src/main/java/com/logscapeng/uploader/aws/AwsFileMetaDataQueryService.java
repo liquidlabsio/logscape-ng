@@ -2,6 +2,8 @@ package com.logscapeng.uploader.aws;
 
 import com.logscapeng.uploader.FileMeta;
 import com.logscapeng.uploader.FileMetaDataQueryService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.extensions.dynamodb.mappingclient.Key;
 import software.amazon.awssdk.extensions.dynamodb.mappingclient.MappedDatabase;
 import software.amazon.awssdk.extensions.dynamodb.mappingclient.MappedTable;
@@ -24,6 +26,8 @@ import static software.amazon.awssdk.extensions.dynamodb.mappingclient.operation
 @ApplicationScoped
 public class AwsFileMetaDataQueryService implements FileMetaDataQueryService {
 
+    private final Logger log = LoggerFactory.getLogger(AwsFileMetaDataQueryService.class);
+
     @Inject
     DynamoDbClient dynamoDbClient;
 
@@ -31,6 +35,7 @@ public class AwsFileMetaDataQueryService implements FileMetaDataQueryService {
     private MappedTable<FileMeta> fileMetaTable;
 
     public AwsFileMetaDataQueryService() {
+        log.info("Created");
     }
 
     @Override

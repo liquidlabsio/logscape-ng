@@ -1,3 +1,8 @@
-com.logscapeng.uploader.fixture.FixturedStorageConverter
+# Note: run with quarkus:test will use fixtures quarkus:dev will use local services with remote storage
+# ./mvnw package -Pnative -Dquarkus.profile=prod-aws`
+# quarkus:prod - The default profile when not running in development or test mode
+com.logscapeng.uploader.aws.AwsStorageConverter
+com.logscapeng.uploader.aws.AwsMetaDataQueryConverter
 com.logscapeng.uploader.fixture.FixturedIndexConverter
-com.logscapeng.uploader.fixture.FixturedQueryConverter
+
+

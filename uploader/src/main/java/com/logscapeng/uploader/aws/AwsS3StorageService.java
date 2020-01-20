@@ -8,26 +8,22 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.logscapeng.uploader.FileMeta;
-import com.logscapeng.uploader.StorageUploader;
+import com.logscapeng.uploader.Storage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AwsS3StorageUploaderService implements StorageUploader {
+public class AwsS3StorageService implements Storage {
 
-    private final Logger log = LoggerFactory.getLogger(AwsS3StorageUploaderService.class);
+    private final Logger log = LoggerFactory.getLogger(AwsS3StorageService.class);
 
-
-
-
-    public AwsS3StorageUploaderService(){
-        log.info("CREATED:");
+    public AwsS3StorageService(){
+        log.info("Created");
     }
 
     @Override

@@ -27,7 +27,7 @@ public class QueryResource implements FileMetaDataQueryService {
     FileMetaDataQueryService query;
 
     @ConfigProperty(name = "storage.uploader")
-    StorageUploader uploader;
+    Storage uploader;
 
 
     @GET

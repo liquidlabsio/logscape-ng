@@ -2,6 +2,9 @@ package com.logscapeng.uploader.fixture;
 
 import com.logscapeng.uploader.FileMeta;
 import com.logscapeng.uploader.FileMetaDataQueryService;
+import com.logscapeng.uploader.aws.AwsS3StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +14,13 @@ import java.util.stream.Collectors;
 
 public class FixturedFileMetaDataQueryService implements FileMetaDataQueryService {
 
+    private final Logger log = LoggerFactory.getLogger(FixturedFileMetaDataQueryService.class);
+
     public static final Map<String, FileMeta> storage = new HashMap<>();
+
+    public FixturedFileMetaDataQueryService(){
+        log.info("Created");
+    }
 
     @Override
     public void createTable() {

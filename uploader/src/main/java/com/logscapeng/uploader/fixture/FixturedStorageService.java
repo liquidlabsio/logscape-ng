@@ -1,20 +1,20 @@
 package com.logscapeng.uploader.fixture;
 
 import com.logscapeng.uploader.FileMeta;
-import com.logscapeng.uploader.StorageUploader;
+import com.logscapeng.uploader.Storage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class FixturedUploaderService implements StorageUploader {
-    private final Logger log = LoggerFactory.getLogger(FixturedUploaderService.class);
+public class FixturedStorageService implements Storage {
+    private final Logger log = LoggerFactory.getLogger(FixturedStorageService.class);
 
     static Map<String, byte[]> storage = new HashMap<>();
 
-    public FixturedUploaderService(){
-        log.info("CREATED");
+    public FixturedStorageService(){
+        log.info("Created");
     }
 
     @Override

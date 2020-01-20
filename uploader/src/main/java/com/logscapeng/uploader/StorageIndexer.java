@@ -3,8 +3,8 @@ package com.logscapeng.uploader;
 public interface StorageIndexer {
 
     /**
-     * CSapture
-     * - uncompessed file size
+     * Capture
+     * - uncompessed file size - capture if needed
      * - compressed file size
      * - eoln character
      * - number of lines

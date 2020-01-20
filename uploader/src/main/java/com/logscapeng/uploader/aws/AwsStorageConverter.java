@@ -8,8 +8,8 @@ import org.eclipse.microprofile.config.spi.Converter;
 
 public class AwsStorageConverter implements Converter<Storage> {
     @Override
-    public Storage convert(String s) {
-        if (s.equalsIgnoreCase(LaunchMode.TEST.name())) {
+    public Storage convert(String mode) {
+        if (mode.equalsIgnoreCase(LaunchMode.TEST.name())) {
             return new FixturedStorageService();
         }
         return new AwsS3StorageService();

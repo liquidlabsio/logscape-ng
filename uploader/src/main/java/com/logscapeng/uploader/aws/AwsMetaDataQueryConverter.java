@@ -11,8 +11,8 @@ import org.eclipse.microprofile.config.spi.Converter;
  */
 public class AwsMetaDataQueryConverter implements Converter<FileMetaDataQueryService> {
     @Override
-    public FileMetaDataQueryService convert(String s) {
-        if (s.equalsIgnoreCase(LaunchMode.TEST.name())) {
+    public FileMetaDataQueryService convert(String mode) {
+        if (mode.equalsIgnoreCase(LaunchMode.TEST.name())) {
             return new FixturedFileMetaDataQueryService();
         }
         return new AwsFileMetaDataQueryService();

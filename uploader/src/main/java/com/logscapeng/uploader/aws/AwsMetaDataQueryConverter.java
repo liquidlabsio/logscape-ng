@@ -3,6 +3,7 @@ package com.logscapeng.uploader.aws;
 import com.logscapeng.uploader.FileMetaDataQueryService;
 import com.logscapeng.uploader.fixture.FixturedFileMetaDataQueryService;
 import com.logscapeng.uploader.fixture.FixturedStorageService;
+import io.quarkus.runtime.LaunchMode;
 import org.eclipse.microprofile.config.spi.Converter;
 
 /**
@@ -11,7 +12,7 @@ import org.eclipse.microprofile.config.spi.Converter;
 public class AwsMetaDataQueryConverter implements Converter<FileMetaDataQueryService> {
     @Override
     public FileMetaDataQueryService convert(String s) {
-        if (s.equalsIgnoreCase("TEST")) {
+        if (s.equalsIgnoreCase(LaunchMode.TEST.name())) {
             return new FixturedFileMetaDataQueryService();
         }
         return new AwsFileMetaDataQueryService();

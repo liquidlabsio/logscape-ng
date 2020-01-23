@@ -3,11 +3,11 @@ package com.liquidlabs.logscape.uploader;
 public interface Storage {
     /**
      * Store and Capture the Storage URL
-     * @param upload
      * @param region
+     * @param upload
      * @return
      */
-    FileMeta upload(FileMeta upload, String region);
+    FileMeta upload(String region, FileMeta upload);
 
-    byte[] get(String storageUrl);
+    byte[] get(String region, String tenant, String storageUrl);
 }

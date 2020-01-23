@@ -2,6 +2,8 @@ package com.liquidlabs.logscape.uploader;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -13,7 +15,9 @@ import javax.ws.rs.core.Response;
 @Path("/upload")
 public class UploaderResource {
 
-    @ConfigProperty(name = "cloud.region", defaultValue = "eu-west-1")
+    private final Logger log = LoggerFactory.getLogger(UploaderResource.class);
+
+    @ConfigProperty(name = "cloud.region", defaultValue = "eu-west-2")
     String cloudRegion;
 
     @ConfigProperty(name = "storage.uploader")
@@ -37,20 +41,29 @@ public class UploaderResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response uploadFile(@MultipartForm FileMeta fileMeta) {
 
-        fileMeta.size = fileMeta.fileContent.length;
+        try {
 
-        // this series of actions should be put on an event queue
-        FileMeta indexedFile = indexer.enrichMeta(fileMeta);
-        FileMeta storedAndIndexedFile = uploader.upload(indexedFile, cloudRegion);
-        // ideally we would trigger an indexing function from the S3 bucket write.
-        // for now Im doing it in process here.
-        FileMeta stored = indexer.index(storedAndIndexedFile, cloudRegion);
+            fileMeta.size = fileMeta.fileContent.length;
+
+            // this series of actions should be put on an event queue
+            FileMeta indexedFile = indexer.enrichMeta(fileMeta);
+            FileMeta storedAndIndexedFile = uploader.upload(cloudRegion, indexedFile);
+            // ideally we would trigger an indexing function from the S3 bucket write.
+            // for now Im doing it in process here.
+            FileMeta stored = indexer.index(storedAndIndexedFile, cloudRegion);
 
 
-        query.put(stored);
+            query.put(stored);
 
-        Response.ResponseBuilder responseBuilder = Response.status(200).entity("Uploaded and Indexed:" + stored);
-        responseBuilder.header(  "Access-Control-Allow-Origin", "*");
-        return responseBuilder.build();
+            Response.ResponseBuilder responseBuilder = Response.status(200).entity("Uploaded and Indexed:" + stored);
+            responseBuilder.header("Access-Control-Allow-Origin", "*");
+            return responseBuilder.build();
+        } catch (Exception ex) {
+            log.error("Error handling request:" + fileMeta, ex);
+            Response.ResponseBuilder responseBuilder = Response.status(500).entity(ex.getMessage());
+            responseBuilder.header("Access-Control-Allow-Origin", "*");
+            return responseBuilder.build();
+
+        }
     }
 }

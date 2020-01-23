@@ -1,15 +1,15 @@
 package com.liquidlabs.logscape.uploader;
 
+import javax.enterprise.inject.spi.BeanManager;
 import java.util.List;
 
 public interface FileMetaDataQueryService {
-    void createTable();
 
     void put(FileMeta fileMeta);
 
     FileMeta find(String tenant, String filename);
 
-    //TODO: get content needs to be removed to projection providers (i.e. deletegate to appropriate projection layer)
+    //TODO: get content needs to be removed to projection providers (i.e. delegate to appropriate projection layer)
     byte[] get(String tenant, String filename);
 
     FileMeta delete(String tenant, String filename);

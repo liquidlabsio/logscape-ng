@@ -1,0 +1,76 @@
+# DEV Configuration file
+# key = value
+
+# used to configured how real the test is;
+# TEST = no connectivity; DEV = connected; PROD = connected
+#
+cloud:
+  region: eu-west-2
+
+logscape:
+  prefix: logscape-dev
+  storage:
+    uploader: TEST
+    indexer: TEST
+    query: TEST
+
+"%dev":
+  logscape:
+    storage:
+      uploader: AWS
+      indexer: AWS
+      query: AWS
+  dynamodb:
+    aws:
+      region: eu-west-2
+      credentials:
+        type: static
+        static-provider:
+          access-key-id: AKIAQA3BCZAHXU2D4P7F
+          secret-access-key: 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
+
+
+"%prod":
+  quarkus:
+    dynamodb:
+      aws:
+        region: eu-west-2
+        credentials:
+          type: default
+          static-provider:
+            access-key-id: test-key
+            secret-access-key: test-secret
+  logscape:
+    prefix: logscape-prod
+    storage:
+      uploader: AWS
+      indexer: AWS
+      query: AWS
+
+
+quarkus:
+    dynamodb:
+      sync-client:
+        type: apache
+      #      endpoint-override: http://192.168.99.100:8000
+      aws:
+        credentials:
+          type: default
+    # DEBUG console logging
+    log:
+      console:
+        enable: true
+        format: "%d{HH:mm:ss} %-5p [%c] %s%e%n"
+        level: TRACE
+
+    # TRACE file logging
+      file:
+        enable: true
+        path: /tmp/quarkus.log
+        level: TRACE
+        format: "%d{HH:mm:ss} %-5p [%c{2.}]] (%t) %s%e%n"
+
+# custom loggers
+      category:
+        "com.liquidlabs.logscape":
+          level: INFO

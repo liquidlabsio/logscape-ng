@@ -18,7 +18,7 @@ public class FixturedStorageService implements Storage {
     }
 
     @Override
-    public FileMeta upload(FileMeta upload, String region) {
+    public FileMeta upload(String region, FileMeta upload) {
         log.info("uploading:" + upload);
         upload.setStorageUrl("s3://somebucket/"+region + "/" + upload.getFilename() + "-to-time=" + upload.getToTime());
         storage.put(upload.getStorageUrl(), upload.fileContent);
@@ -27,7 +27,7 @@ public class FixturedStorageService implements Storage {
     }
 
     @Override
-    public byte[] get(String storageUrl) {
+    public byte[] get(String region, String tenant, String storageUrl) {
         return storage.get(storageUrl);
     }
 }

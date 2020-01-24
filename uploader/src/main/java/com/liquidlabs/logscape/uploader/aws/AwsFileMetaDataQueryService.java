@@ -36,7 +36,7 @@ public class AwsFileMetaDataQueryService implements FileMetaDataQueryService {
     DynamoDbClient dynamoDbClient;
 
     @ConfigProperty(name = "logscape.prefix", defaultValue = "logscape.")
-    private String PREFIX;
+    String PREFIX;
 
     private MappedDatabase database;
     private MappedTable<FileMeta> fileMetaTable;

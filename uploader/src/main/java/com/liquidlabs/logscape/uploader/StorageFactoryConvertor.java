@@ -1,5 +1,6 @@
 package com.liquidlabs.logscape.uploader;
 
+import com.liquidlabs.logscape.uploader.aws.AWS;
 import com.liquidlabs.logscape.uploader.aws.AwsS3StorageService;
 import com.liquidlabs.logscape.uploader.fixture.FixturedStorageService;
 import io.quarkus.runtime.LaunchMode;
@@ -14,7 +15,9 @@ public class StorageFactoryConvertor implements Converter<Storage> {
         log.info("Mode:" + mode);
         if (mode.equalsIgnoreCase(LaunchMode.TEST.name())) {
             return new FixturedStorageService();
+        } else if (mode.equalsIgnoreCase(AWS.CONFIG)) {
+            return new AwsS3StorageService();
         }
-        return new AwsS3StorageService();
+        return new FixturedStorageService();
     }
 }

@@ -51,7 +51,7 @@ public class AwsFileMetaDataQueryService implements FileMetaDataQueryService {
         if (!created && !tableExists()) {
             created = true;
             log.info("Creating table:" + getTableName());
-            ProvisionedThroughput.Builder provisionedThroughput = ProvisionedThroughput.builder().readCapacityUnits(10l).writeCapacityUnits(10L);
+            ProvisionedThroughput.Builder provisionedThroughput = ProvisionedThroughput.builder().readCapacityUnits(10L).writeCapacityUnits(10L);
             CreateTable<FileMeta> fileMetaCreateTable = CreateTable.of(provisionedThroughput.build()).toBuilder().build();
             MappedTable<FileMeta> table = getTable();
             table.execute(fileMetaCreateTable);
@@ -171,7 +171,7 @@ public class AwsFileMetaDataQueryService implements FileMetaDataQueryService {
      * Required because the Convertor factory does not create instances using the bean-factory
      * @return
      */
-    private synchronized DynamoDbClient bind() {
+    public synchronized DynamoDbClient bind() {
         if (dynamoDbClient == null) {
             log.info("Binding to CDI Beans");
             BeanManager beanManager = CDI.current().getBeanManager();

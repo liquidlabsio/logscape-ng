@@ -12,7 +12,7 @@ Resources:
     Properties:
       Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
       Runtime: java8
-      CodeUri: s3://quarkus-lambda-test/e9f19d590b9b27db2a711e16c2918a02
+      CodeUri: s3://logscape-runtime-test/6b82b7f7821d682cfa43ab2e13178d0d
       MemorySize: 512
       Policies: AWSLambdaFullAccess
       Timeout: 15
@@ -24,7 +24,7 @@ Resources:
             Method: any
 Outputs:
   LogscapeApi:
-    Description: URL for application
+    Description: The REST API for the web-frontend
     Value:
       Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
     Export:

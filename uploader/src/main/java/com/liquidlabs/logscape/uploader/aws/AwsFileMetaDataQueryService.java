@@ -2,6 +2,8 @@ package com.liquidlabs.logscape.uploader.aws;
 
 import com.liquidlabs.logscape.uploader.FileMeta;
 import com.liquidlabs.logscape.uploader.FileMetaDataQueryService;
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.extensions.dynamodb.mappingclient.Key;
@@ -14,6 +16,8 @@ import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,27 +35,39 @@ public class AwsFileMetaDataQueryService implements FileMetaDataQueryService {
     @Inject
     DynamoDbClient dynamoDbClient;
 
+    @ConfigProperty(name = "logscape.prefix", defaultValue = "logscape.")
+    String PREFIX;
+
     private MappedDatabase database;
     private MappedTable<FileMeta> fileMetaTable;
+
 
     public AwsFileMetaDataQueryService() {
         log.info("Created");
     }
 
-    @Override
-    public void createTable(){
-        if (!tableExists()) {
+    private boolean created = false;
+    synchronized public void createTable(){
+        if (!created && !tableExists()) {
+            created = true;
+            log.info("Creating table:" + getTableName());
             ProvisionedThroughput.Builder provisionedThroughput = ProvisionedThroughput.builder().readCapacityUnits(10l).writeCapacityUnits(10L);
             CreateTable<FileMeta> fileMetaCreateTable = CreateTable.of(provisionedThroughput.build()).toBuilder().build();
             MappedTable<FileMeta> table = getTable();
             table.execute(fileMetaCreateTable);
+            // cannot use the table while it is being created - triggers errors when querying
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private boolean tableExists() {
         ListTablesResponse listTablesResponse = dynamoDbClient.listTables();
         HashSet<String> strings = new HashSet<>(listTablesResponse.tableNames());
-        return strings.contains(FileMeta.class.getSimpleName());
+        return strings.contains(getTableName());
     }
 
     @Override
@@ -117,6 +133,9 @@ public class AwsFileMetaDataQueryService implements FileMetaDataQueryService {
      */
     @Override
     public List<FileMeta> list() {
+        bind();
+        createTable();
+
         Iterable<Page<FileMeta>> files = getTable().execute(Scan.create());
         ArrayList<FileMeta> fileMetas = new ArrayList<>();
         files.iterator().forEachRemaining(action -> fileMetas.addAll(action.items()));
@@ -129,18 +148,40 @@ public class AwsFileMetaDataQueryService implements FileMetaDataQueryService {
      */
     private MappedTable<FileMeta> getTable() {
         if (fileMetaTable == null) {
-            fileMetaTable = getDatabase().table(FileMeta.class.getSimpleName(), Model.FILE_META_TABLE_SCHEMA);
+            fileMetaTable = getDatabase().table(getTableName(), Model.FILE_META_TABLE_SCHEMA);
         }
         return fileMetaTable;
     }
 
+    private String getTableName() {
+        return PREFIX + "."  +FileMeta.class.getSimpleName();
+    }
+
     private MappedDatabase getDatabase() {
+
         if (database == null) {
             database = MappedDatabase.builder()
-                    .dynamoDbClient(dynamoDbClient)
+                    .dynamoDbClient(bind())
                     .build();
         }
         return database;
+    }
+
+    /**
+     * Required because the Convertor factory does not create instances using the bean-factory
+     * @return
+     */
+    private synchronized DynamoDbClient bind() {
+        if (dynamoDbClient == null) {
+            log.info("Binding to CDI Beans");
+            BeanManager beanManager = CDI.current().getBeanManager();
+            dynamoDbClient = (DynamoDbClient) beanManager.getBeans(DynamoDbClient.class).iterator().next().create(null);
+            if (dynamoDbClient == null) {
+                throw new RuntimeException("Failed to late-bind DynamoDBClient - check QueryFactoryConvertor config in application.[properties/yaml]");
+            }
+            PREFIX = ConfigProvider.getConfig().getValue("logscape.prefix", String.class);
+        }
+        return dynamoDbClient;
     }
 
 

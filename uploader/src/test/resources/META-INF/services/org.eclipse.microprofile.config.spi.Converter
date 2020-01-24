@@ -1,5 +1,3 @@
-com.liquidlabs.logscape.uploader.fixture.FixturedStorageConverter
-com.liquidlabs.logscape.uploader.fixture.FixturedIndexConverter
-com.liquidlabs.logscape.uploader.fixture.FixturedQueryConverter
-#AwsStorageConverter
-
+com.liquidlabs.logscape.uploader.StorageFactoryConvertor
+com.liquidlabs.logscape.uploader.IndexingFactoryConverter
+com.liquidlabs.logscape.uploader.QueryFactoryConvertor

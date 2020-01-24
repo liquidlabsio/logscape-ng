@@ -5,6 +5,7 @@ import com.liquidlabs.logscape.uploader.FileMetaDataQueryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.inject.spi.BeanManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +20,6 @@ public class FixturedFileMetaDataQueryService implements FileMetaDataQueryServic
 
     public FixturedFileMetaDataQueryService(){
         log.info("Created");
-    }
-
-    @Override
-    public void createTable() {
     }
 
     @Override

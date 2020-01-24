@@ -11,12 +11,12 @@ $(document).ready(function () {
       data.formData = {
                 filename: data.files[0].name,
                 toTime: data.files[0].lastModified,
-                tenant: $("#uploadResourceInput").val(),
+                tenant: DEFAULT_TENANT,
                 resource: $("#uploadResourceInput").val(),
                 tags: $("#uploadTagsInput").val()
                 }
       if (data.formData.resource.length == 0 || data.formData.tags.length == 0) {
-        alert("Resource value must be specified; try again")
+        alert("Resource identifier must be specified; try again")
         return false;
       }
       data.context = $('<p class="file">')

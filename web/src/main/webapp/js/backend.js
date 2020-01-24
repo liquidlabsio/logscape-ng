@@ -1,17 +1,13 @@
 
 LOGSCAPE_URL = 'http://0.0.0.0:8080'
+//LOGSCAPE_URL = 'https://5er31crao2.execute-api.eu-west-2.amazonaws.com/Prod'
 KEY = '5b578yg9yvi8sogirbvegoiufg9v9g579gviuiub8' // not real
+DEFAULT_TENANT='neil-test'
 
 $(document).ready(function () {
     binding()
 
 });
-
-
-//import streamSaver from 'streamsaver'
-//const streamSaver = require('streamsaver')
-//const streamSaver = window.streamSaver
-
 
 class FilesInterface {
 
@@ -71,7 +67,7 @@ class RestVersion extends FilesInterface {
     }
 
     fileContents(filename) {
-            $.get(LOGSCAPE_URL + '/query/get', {tenant:'unknown', filename: filename, download: true},
+            $.get(LOGSCAPE_URL + '/query/get', {tenant:DEFAULT_TENANT, filename: filename, download: true},
                 function(response) {
                     $.Topic(Logscape.Explorer.Topics.setFileContent).publish(response);
                 }
@@ -79,9 +75,8 @@ class RestVersion extends FilesInterface {
     }
 
     downloadFileContent(filename) {
-        let tenant = 'individual';
             window.open(
-              LOGSCAPE_URL + '/query/download/' + tenant + '/'  + filename
+              LOGSCAPE_URL + '/query/download/' + DEFAULT_TENANT + '/'  + filename
             )
     }
 }

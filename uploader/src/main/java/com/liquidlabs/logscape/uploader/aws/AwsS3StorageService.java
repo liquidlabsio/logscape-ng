@@ -2,37 +2,47 @@ package com.liquidlabs.logscape.uploader.aws;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.liquidlabs.logscape.uploader.FileMeta;
 import com.liquidlabs.logscape.uploader.Storage;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+@ApplicationScoped
 public class AwsS3StorageService implements Storage {
 
     private final Logger log = LoggerFactory.getLogger(AwsS3StorageService.class);
+
+    @ConfigProperty(name = "logscape.prefix", defaultValue = "logscape.")
+    private String PREFIX;
+
 
     public AwsS3StorageService(){
         log.info("Created");
     }
 
     @Override
-    public FileMeta upload(final FileMeta upload, final String region) {
-        log.info("uploading:" + upload);
+    public FileMeta upload(final String region, final FileMeta upload) {
+        bind();
 
-        Regions clientRegion = Regions.fromName(region);
-        String bucketName = upload.getTenantWithDate();
+        String bucketName = getBucketName(upload.getTenant());
         String filePath = upload.resource + "/" + upload.filename;
+
+        log.info("uploading:" + upload + " bucket:" + upload.getTenant());
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.addUserMetadata("tags", upload.getTags().toString());
@@ -45,10 +55,7 @@ public class AwsS3StorageService implements Storage {
         long partSize = 5 * 1024 * 1024; // Set part size to 5 MB.
 
         try {
-            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                    .withRegion(clientRegion)
-                    .withCredentials(new ProfileCredentialsProvider())
-                    .build();
+            AmazonS3 s3Client = getAmazonS3Client(region);
 
 
             if (!s3Client.doesBucketExistV2(bucketName)) {
@@ -112,9 +119,46 @@ public class AwsS3StorageService implements Storage {
         return upload;
     }
 
+    private String getBucketName(String tenant) {
+        return (PREFIX + "." + tenant).toLowerCase();
+    }
+
+    private static AmazonS3 getAmazonS3Client(String region) {
+        return AmazonS3ClientBuilder.standard()
+                .withRegion(region)
+//                .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
+                .build();
+    }
+
+    synchronized private void bind() {
+        if (PREFIX == null) {
+            PREFIX = ConfigProvider.getConfig().getValue("logscape.prefix", String.class);
+        }
+    }
+
+    /**
+     * TODO: Seek to offset/compression-handling[on-off]/direct-download etd
+     * @param region
+     * @param tenant
+     * @param storageUrl
+     * @return
+     */
     @Override
-    public byte[] get(String storageUrl) {
-        throw new RuntimeException("Not implemented yet!");
+    public byte[] get(String region, String tenant, String storageUrl) {
+        bind();
+
+
+        try {
+            AmazonS3 s3Client = getAmazonS3Client(region);
+            S3Object s3object = s3Client.getObject(getBucketName(tenant), new URI(storageUrl).getPath().substring(1));
+            S3ObjectInputStream inputStream = s3object.getObjectContent();
+
+            return IOUtils.toByteArray(inputStream);
+
+        } catch (Exception e) {
+            log.error("Failed to retrieve {} / {}", tenant, storageUrl, e);
+            throw new RuntimeException(e);
+        }
     }
 
     private File createTempFile(byte[] filecontent) {
@@ -144,10 +188,7 @@ public class AwsS3StorageService implements Storage {
         long partSize = 5 * 1024 * 1024; // Set part size to 5 MB.
 
         try {
-            AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                    .withRegion(clientRegion)
-                    .withCredentials(new ProfileCredentialsProvider())
-                    .build();
+            AmazonS3 s3Client = getAmazonS3Client(clientRegion.getName());
 
             // Create a list of ETag objects. You retrieve ETags for each object part uploaded,
             // then, after each individual part has been uploaded, pass the list of ETags to

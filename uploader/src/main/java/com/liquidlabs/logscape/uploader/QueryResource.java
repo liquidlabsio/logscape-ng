@@ -4,7 +4,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -19,8 +18,7 @@ import java.util.List;
 @Path("/query")
 public class QueryResource implements FileMetaDataQueryService {
 
-    @Inject
-    @ConfigProperty(name = "cloud.region", defaultValue = "eu-west-1")
+    @ConfigProperty(name = "cloud.region", defaultValue = "eu-west-2")
     String cloudRegion;
 
     @ConfigProperty(name = "storage.query")
@@ -29,17 +27,11 @@ public class QueryResource implements FileMetaDataQueryService {
     @ConfigProperty(name = "storage.uploader")
     Storage uploader;
 
-
     @GET
     @Path("/id")
     @Produces(MediaType.TEXT_PLAIN)
     public String id() {
         return QueryResource.class.getCanonicalName();
-    }
-
-    // TODO: no!!
-    @Override
-    public void createTable() {
     }
 
     @PUT
@@ -62,8 +54,7 @@ public class QueryResource implements FileMetaDataQueryService {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public byte[] get(@QueryParam("tenant") String tenant, @QueryParam("filename")  String filename) {
         FileMeta fileMeta = query.find(tenant, filename);
-        return uploader.get(fileMeta.getStorageUrl());
-//        return fileMeta;
+        return uploader.get(cloudRegion, tenant, fileMeta.getStorageUrl());
     }
 
     @GET
@@ -71,7 +62,7 @@ public class QueryResource implements FileMetaDataQueryService {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response download(@PathParam("tenant") String tenant, @PathParam("filename")  String filename) {
         FileMeta fileMeta = query.find(tenant, filename);
-        byte[] content = uploader.get(fileMeta.getStorageUrl());
+        byte[] content = uploader.get(cloudRegion, tenant, fileMeta.getStorageUrl());
         return Response.ok(content, MediaType.APPLICATION_OCTET_STREAM)
                 .header("content-disposition", "attachment; filename=\"" + filename + "\"")
                 .header("Content-Length", content.length).build();

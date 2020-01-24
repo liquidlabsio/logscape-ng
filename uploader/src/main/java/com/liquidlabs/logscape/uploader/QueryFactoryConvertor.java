@@ -1,5 +1,6 @@
 package com.liquidlabs.logscape.uploader;
 
+import com.liquidlabs.logscape.uploader.aws.AWS;
 import com.liquidlabs.logscape.uploader.aws.AwsFileMetaDataQueryService;
 import com.liquidlabs.logscape.uploader.fixture.FixturedFileMetaDataQueryService;
 import io.quarkus.runtime.LaunchMode;
@@ -17,9 +18,9 @@ public class QueryFactoryConvertor implements Converter<FileMetaDataQueryService
 
         if (mode.equalsIgnoreCase(LaunchMode.TEST.name())) {
             return new FixturedFileMetaDataQueryService();
+        } else if (mode.equalsIgnoreCase(AWS.CONFIG)) {
+            return new AwsFileMetaDataQueryService();
         }
-
-        // TODO: Why isnt AwsFileMetXXX available as a bean?
-        return new AwsFileMetaDataQueryService();
+        return new FixturedFileMetaDataQueryService();
     }
 }

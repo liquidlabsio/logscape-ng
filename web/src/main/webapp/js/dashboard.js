@@ -17,6 +17,9 @@ Logscape.Navigation = function () {
   setupNavigationActions();
 
 
+    $("#tenantInfo").val(DEFAULT_TENANT)
+    $("#restAPIInfo").val(LOGSCAPE_URL)
+
   function setupNavigationActions() {
 
     $(".nav-link").click(function (event) {

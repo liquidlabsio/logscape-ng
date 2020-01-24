@@ -102,7 +102,7 @@
                     </h6>
                     <ul class="nav flex-column mb-2">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="#" data-target="configuration">
                                 <span data-feather="file-text"></span>
                                 Configure
                             </a>
@@ -188,6 +188,29 @@
                             <br>
                         <div id="files-list"></div>
 
+                        </form>
+
+
+                    </div>
+                </div>
+                <div id="configuration"  class="mainPanelTab" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Configuration (read-only)</h1>
+                    </div>
+                    <div>
+                        <form>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="tenantInfo">Tenant Identity</label>
+                                    <input  name="resource"  type="text" class="form-control" id="tenantInfo"  placeholder="Enter an resource, host or device name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="restAPIInfo">REST API</label>
+                                    <input name="tags"  type="text" class="form-control" id="restAPIInfo" aria-describedby="emailHelp" placeholder="Address of the REST API being used" title="This is the text of the tooltip">
+                                </div>
+                            </div>
+
+                            <br>
                         </form>
 
 

@@ -21,6 +21,8 @@ logscape:
       indexer: AWS
       query: AWS
   dynamodb:
+    sync-client:
+      type: apache
     aws:
       region: eu-west-2
       credentials:
@@ -30,6 +32,8 @@ logscape:
 "%prod":
   quarkus:
     dynamodb:
+      sync-client:
+        type: apache
       aws:
         region: eu-west-2
         credentials:

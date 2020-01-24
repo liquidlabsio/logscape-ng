@@ -21,10 +21,10 @@ public class QueryResource implements FileMetaDataQueryService {
     @ConfigProperty(name = "cloud.region", defaultValue = "eu-west-2")
     String cloudRegion;
 
-    @ConfigProperty(name = "storage.query")
+    @ConfigProperty(name = "logscape.storage.query")
     FileMetaDataQueryService query;
 
-    @ConfigProperty(name = "storage.uploader")
+    @ConfigProperty(name = "logscape.storage.uploader")
     Storage uploader;
 
     @GET

@@ -20,13 +20,13 @@ public class UploaderResource {
     @ConfigProperty(name = "cloud.region", defaultValue = "eu-west-2")
     String cloudRegion;
 
-    @ConfigProperty(name = "storage.uploader")
+    @ConfigProperty(name = "logscape.storage.uploader")
     Storage uploader;
 
-    @ConfigProperty(name = "storage.indexer")
+    @ConfigProperty(name = "logscape.storage.indexer")
     StorageIndexer indexer;
 
-    @ConfigProperty(name = "storage.query")
+    @ConfigProperty(name = "logscape.storage.query")
     FileMetaDataQueryService query;
 
     @GET

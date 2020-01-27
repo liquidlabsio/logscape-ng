@@ -1,10 +1,26 @@
 /* globals Chart:false, feather:false */
 
-// (function () {
 $(document).ready(function () {
   'use strict'
 
-  $("#fileupload").attr("data-url", LOGSCAPE_URL + '/upload/file')
+    $("#dataImportForm").submit(function(event) {
+        let inputs = $(this).serializeArray();
+
+        if (inputs[0].value.length == 0 || inputs[1].value.length == 0 || inputs[2].value.length == 0) {
+            alert("Please provide values for all 3 inputs")
+            return false;
+        }
+        $.Topic(Logscape.Explorer.Topics.importFromStorage).publish(
+                inputs[0].value, inputs[1].value, inputs[2].value
+        );
+        return false;
+    })
+
+   $.Topic(Logscape.Explorer.Topics.importedFromStorage).subscribe(function(event) {
+        alert("Stuff was imported:" + event)
+   })
+
+  $("#fileupload").attr("data-url", LOGSCAPE_URL + '/storage/upload')
   $("#fileupload").fileupload({
     dataType: "json",
     add: function(e, data) {
@@ -41,7 +57,6 @@ $(document).ready(function () {
     .bind('fileuploaddone', function (e, data) {
     console.log("done!!")
     })
-
 });
 
 

@@ -8,14 +8,15 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * First (naive) implementation.
  */
-@Path("/upload")
-public class UploaderResource {
+@Path("/storage")
+public class StorageResource {
 
-    private final Logger log = LoggerFactory.getLogger(UploaderResource.class);
+    private final Logger log = LoggerFactory.getLogger(StorageResource.class);
 
     @ConfigProperty(name = "cloud.region", defaultValue = "eu-west-2")
     String cloudRegion;
@@ -32,11 +33,11 @@ public class UploaderResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String id() {
-        return UploaderResource.class.getCanonicalName();
+        return StorageResource.class.getCanonicalName();
     }
 
     @POST
-    @Path("/file")
+    @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
     public Response uploadFile(@MultipartForm FileMeta fileMeta) {
@@ -66,4 +67,27 @@ public class UploaderResource {
 
         }
     }
+
+    @GET
+    @Path("/import")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<FileMeta> importFromStorage(@QueryParam("tenant") String tenant, @QueryParam("storageId") String storageId, @QueryParam("includeFileMask") String includeFileMask,  @QueryParam("tags") String tags) {
+        List<FileMeta> imported = uploader.importFromStorage(cloudRegion, tenant, storageId, includeFileMask, tags);
+        imported.stream().forEach(fileMeta -> query.put(indexer.index(fileMeta, cloudRegion)));
+        return imported;
+    }
+    @GET
+    @Path("/importStorage")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<FileMeta> removeByStorageId(@QueryParam("tenant") String tenant, @QueryParam("storageId") String storageId, @QueryParam("includeFileMask") String includeFileMask) {
+        List<FileMeta> removed = uploader.removeByStorageId(cloudRegion, tenant, storageId, includeFileMask);
+
+        removed.stream().forEach(fileMeta -> query.delete(fileMeta.getTenant(), fileMeta.getFilename())
+        );
+
+        return removed;
+    }
+
 }

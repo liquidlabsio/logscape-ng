@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
-class UploaderResourceTest {
+class StorageResourceTest {
 
     @BeforeEach
     void setUp() {
@@ -27,10 +27,10 @@ class UploaderResourceTest {
     public void testIdEndpoint() {
 
         given()
-                .when().get("/upload")
+                .when().get("/storage")
                 .then()
                 .statusCode(200)
-                .body(is(UploaderResource.class.getName()));
+                .body(is(StorageResource.class.getName()));
     }
 
     @Test
@@ -48,7 +48,7 @@ class UploaderResourceTest {
                 .formParam("resource", fileMeta.resource)
                 .formParam("tags", fileMeta.tags)
                 .when()
-                .post("/upload/file")
+                .post("/storage/upload")
                 .then()
                 .statusCode(200)
                 .body(containsString("Uploaded"));

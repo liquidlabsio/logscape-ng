@@ -17,4 +17,5 @@ public interface FileMetaDataQueryService {
     List<FileMeta> query(String tenant, String filenamePart, String tagNamePart);
 
     List<FileMeta> list();
+
 }

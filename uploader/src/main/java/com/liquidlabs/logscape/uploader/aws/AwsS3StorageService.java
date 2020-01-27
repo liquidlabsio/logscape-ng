@@ -20,7 +20,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class AwsS3StorageService implements Storage {
@@ -34,6 +36,51 @@ public class AwsS3StorageService implements Storage {
     public AwsS3StorageService(){
         log.info("Created");
     }
+
+    /**
+     * Doesnt actually removed external entities, but lists them instead
+     * @param region
+     * @param tenant
+     * @param storageId
+     * @param includeFileMask
+     * @return
+     */
+    @Override
+    public List<FileMeta> removeByStorageId(String region, String tenant, String storageId, String includeFileMask) {
+        return importFromStorage(region, tenant, storageId, includeFileMask, "");
+    }
+
+    @Override
+    public List<FileMeta> importFromStorage(String region, String tenant, String storageId, String includeFileMask, String tags) {
+        String bucketName = storageId;
+        AmazonS3 s3Client = getAmazonS3Client(region);
+
+        ObjectListing objectListing = s3Client.listObjects(bucketName, "");
+        List<FileMeta> fileMetas = objectListing.getObjectSummaries().stream().filter(item -> item.getKey().contains(includeFileMask) || includeFileMask.equals("*")).map(objSummary ->
+        {
+            FileMeta fileMeta = new FileMeta(tenant,
+                    objSummary.getBucketName(),
+                    objSummary.getETag(),
+                    objSummary.getKey(),
+                    new byte[0],
+                    objSummary.getLastModified().getTime() - (24 * 60 * 60 * 1000),
+                    objSummary.getLastModified().getTime());
+            fileMeta.setSize(objSummary.getSize());
+            fileMeta.setStorageUrl(String.format("s3://%s/%s", bucketName, objSummary.getKey()));
+            fileMeta.setTags(tags + " " + getExtensions(objSummary.getKey()));
+            return fileMeta;
+        })
+                .collect(Collectors.toList());
+        return fileMetas;
+    }
+
+    private String getExtensions(String filename) {
+        if (filename.contains(".")) return Arrays.toString(filename.split("."));
+        return "";
+    }
+
+
+
 
     @Override
     public FileMeta upload(final String region, final FileMeta upload) {
@@ -102,7 +149,8 @@ public class AwsS3StorageService implements Storage {
                     initResponse.getUploadId(), partETags);
             CompleteMultipartUploadResult completeMultipartUploadResult = s3Client.completeMultipartUpload(compRequest);
 
-            upload.storageUrl = completeMultipartUploadResult.getLocation();
+//            upload.storageUrl = completeMultipartUploadResult.getLocation();
+            upload.setStorageUrl(String.format("s3://%s/%s", bucketName, filePath));
 
         } catch (AmazonServiceException e) {
             // The call was transmitted successfully, but Amazon S3 couldn't process
@@ -139,24 +187,27 @@ public class AwsS3StorageService implements Storage {
     /**
      * TODO: Seek to offset/compression-handling[on-off]/direct-download etd
      * @param region
-     * @param tenant
      * @param storageUrl
      * @return
      */
     @Override
-    public byte[] get(String region, String tenant, String storageUrl) {
+    public byte[] get(String region, String storageUrl) {
         bind();
 
 
         try {
+            URI uri = new URI(storageUrl);
+            String bucket = uri.getHost();
+            String filename = uri.getPath().substring(1);
+
             AmazonS3 s3Client = getAmazonS3Client(region);
-            S3Object s3object = s3Client.getObject(getBucketName(tenant), new URI(storageUrl).getPath().substring(1));
+            S3Object s3object = s3Client.getObject(bucket, filename);
             S3ObjectInputStream inputStream = s3object.getObjectContent();
 
             return IOUtils.toByteArray(inputStream);
 
         } catch (Exception e) {
-            log.error("Failed to retrieve {} / {}", tenant, storageUrl, e);
+            log.error("Failed to retrieve {}", storageUrl, e);
             throw new RuntimeException(e);
         }
     }

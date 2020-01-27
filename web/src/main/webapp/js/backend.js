@@ -21,6 +21,9 @@ class FilesInterface {
     fileContents(filename) {
         throw new err ("not implemented")
     }
+    importFromStorage(storageId, includeFileMask, tags) {
+        throw new err ("not implemented")
+    }
 }
 
 var testFiles = [
@@ -34,7 +37,7 @@ var fixturedFiles = new Map([
     ]
 );
 
-class FilesFixture extends  FilesInterface {
+class FilesFixture extends FilesInterface {
 
     listFiles() {
         let results = new Array();
@@ -49,9 +52,10 @@ class FilesFixture extends  FilesInterface {
             fixturedFiles.get(filename).name + " made up file contents from the test fixture"
         );
     }
+    importFromStorage(storageId, includeFileMask, tags) {
+        throw new err ("not implemented")
+    }
 }
-
-
 
 
 class RestVersion extends FilesInterface {
@@ -64,42 +68,57 @@ class RestVersion extends FilesInterface {
             }
         )
     }
+    importFromStorage(storageId, tags, includeFileMask) {
+            $.get(LOGSCAPE_URL + '/storage/import', {tenant:DEFAULT_TENANT, storageId: storageId, includeFileMask: includeFileMask, tags: tags},
+                function(response) {
+                    $.Topic(Logscape.Explorer.Topics.importedFromStorage).publish(response);
+                })
+//            .error(function (xhr, ajaxOptions, thrownError) {
+//                        alert(xhr.status);
+//                        alert(thrownError);
+//              })
 
+    }
     fileContents(filename) {
             $.get(LOGSCAPE_URL + '/query/get', {tenant:DEFAULT_TENANT, filename: filename, download: true},
                 function(response) {
                     $.Topic(Logscape.Explorer.Topics.setFileContent).publish(response);
-                }
-            )
+                })
+//            .error(function (xhr, ajaxOptions, thrownError) {
+//                        alert(xhr.status);
+//                        alert(thrownError);
+//              })
+
     }
 
     downloadFileContent(filename) {
+        console.log("Downloading:" + LOGSCAPE_URL + '/query/download/' + DEFAULT_TENANT + '/'  + filename)
             window.open(
-              LOGSCAPE_URL + '/query/download/' + DEFAULT_TENANT + '/'  + filename
+              LOGSCAPE_URL + '/query/download/' + encodeURIComponent(DEFAULT_TENANT) + '/'  + encodeURIComponent(filename)
             )
     }
 }
 
 function binding () {
-    // let filesFixture = new FilesFixture();
-    let filesFixture = new RestVersion();
+    // let backend = new FilesFixture();
+    let backend = new RestVersion();
 
-    console.log("Backend is using:" + filesFixture.constructor.name)
+    console.log("Backend is using:" + backend.constructor.name)
 
-    // $.Topic(Logscape.Explorer.Topics.uploadFile).subscribe(function(event) {
-    //     $.Topic(Logscape.Explorer.Topics.uploadFile).publish(filesFixture.upload());
-    // })
     $.Topic(Logscape.Explorer.Topics.getListFiles).subscribe(function(event) {
-        filesFixture.listFiles();
+        backend.listFiles();
     })
     $.Topic(Logscape.Explorer.Topics.getFileContent).subscribe(function(event) {
-        filesFixture.fileContents(event);
+        backend.fileContents(event);
     })
 
     $.Topic(Logscape.Explorer.Topics.downloadFileContent).subscribe(function(event) {
-        filesFixture.downloadFileContent(event);
+        backend.downloadFileContent(event);
     })
 
+    $.Topic(Logscape.Explorer.Topics.importFromStorage).subscribe(function(storageId, includeFileMask, tags) {
+        backend.importFromStorage(storageId, includeFileMask, tags);
+    })
 
 }
 

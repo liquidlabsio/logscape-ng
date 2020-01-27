@@ -54,34 +54,40 @@ public class QueryResource implements FileMetaDataQueryService {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public byte[] get(@QueryParam("tenant") String tenant, @QueryParam("filename")  String filename) {
         FileMeta fileMeta = query.find(tenant, filename);
-        return uploader.get(cloudRegion, tenant, fileMeta.getStorageUrl());
+        return uploader.get(cloudRegion, fileMeta.getStorageUrl());
     }
 
+    /**
+     * Note - using pathparams to enable GET request opening/downloading in browser tab
+     * @param tenant
+     * @param filename
+     * @return
+     */
     @GET
     @Path("/download/{tenant}/{filename}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response download(@PathParam("tenant") String tenant, @PathParam("filename")  String filename) {
         FileMeta fileMeta = query.find(tenant, filename);
-        byte[] content = uploader.get(cloudRegion, tenant, fileMeta.getStorageUrl());
+        byte[] content = uploader.get(cloudRegion, fileMeta.getStorageUrl());
         return Response.ok(content, MediaType.APPLICATION_OCTET_STREAM)
                 .header("content-disposition", "attachment; filename=\"" + filename + "\"")
                 .header("Content-Length", content.length).build();
     }
 
     @DELETE
-    @Path("/delete/{tenant}/{filename}")
+    @Path("/delete")
     @Produces(MediaType.APPLICATION_JSON)
-    public FileMeta delete(@PathParam("tenant") String tenant, @PathParam("filename")  String filename) {
+    public FileMeta delete(@QueryParam("tenant") String tenant, @QueryParam("filename")  String filename) {
         return query.delete(tenant, filename);
     }
 
     @GET
-    @Path("/query/{tenant}/{filenamePart}/{tagNamePart}")
+    @Path("/query")
     @Produces(MediaType.APPLICATION_JSON)
     public List<FileMeta> query(
-            @PathParam("tenant") String tenant
-            , @PathParam("filenamePart") String filenamePart
-            , @PathParam("tagNamePart") String tagNamePart
+            @QueryParam("tenant") String tenant
+            , @QueryParam("filenamePart") String filenamePart
+            , @QueryParam("tagNamePart") String tagNamePart
     ) {
         return query.query(tenant, filenamePart, tagNamePart);
     }

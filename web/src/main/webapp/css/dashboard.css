@@ -136,3 +136,7 @@ File upload UI
    padding: 5px;
    color: black;
 }
+
+.file-upload-label {
+    width: 180px;
+}

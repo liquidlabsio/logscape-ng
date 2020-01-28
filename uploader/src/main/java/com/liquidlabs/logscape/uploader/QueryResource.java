@@ -50,9 +50,9 @@ public class QueryResource implements FileMetaDataQueryService {
 
 
     @GET
-    @Path("/get")
+    @Path("/get/{tenant}/{filename}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public byte[] get(@QueryParam("tenant") String tenant, @QueryParam("filename")  String filename) {
+    public byte[] get(@PathParam("tenant") String tenant, @PathParam("filename")  String filename) {
         FileMeta fileMeta = query.find(tenant, filename);
         return uploader.get(cloudRegion, fileMeta.getStorageUrl());
     }

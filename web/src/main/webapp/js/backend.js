@@ -91,8 +91,32 @@ class RestVersion extends FilesInterface {
 
         }
 
+//let pakoGzCompressor = window.pako;
     fileContents(filename) {
-            $.get(LOGSCAPE_URL + '/query/get', {tenant:DEFAULT_TENANT, filename: filename, download: true},
+        // jquery ajax binary support is missing - use standard JS
+        if (filename.endsWith(".gz")) {
+            let url = LOGSCAPE_URL + '/query/get/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename)
+            var oReq = new XMLHttpRequest();
+            oReq.open("GET", url, true);
+            oReq.responseType = "blob";
+
+            oReq.onload = function(oEvent) {
+              let blob = oReq.response;
+//              let arrayBuffer = await new Response(blob).arrayBuffer()
+              var reader = new FileReader();
+              reader.readAsArrayBuffer(blob);
+              reader.onloadend = (event) => {
+                  // The contents of the BLOB are in reader.result:
+                  var byteArrayStuff = reader.result;
+                  let textyBytes = pako.inflate(byteArrayStuff);
+                  var explodedString = new TextDecoder("utf-8").decode(textyBytes);
+                  $.Topic(Logscape.Explorer.Topics.setFileContent).publish(explodedString);
+                }
+              }
+              // ...
+            oReq.send();
+        } else {
+            $.get(LOGSCAPE_URL + '/query/get/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename),{},
                 function(response) {
                     $.Topic(Logscape.Explorer.Topics.setFileContent).publish(response);
                 })
@@ -100,6 +124,7 @@ class RestVersion extends FilesInterface {
 //                        alert(xhr.status);
 //                        alert(thrownError);
 //              })
+        }
 
     }
 

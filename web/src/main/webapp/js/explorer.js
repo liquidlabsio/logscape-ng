@@ -20,9 +20,11 @@ $(document).ready(function () {
     let editor = ace.edit("explorerEditor");
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/javascript");
+    editor.session.setUseWrapMode(true);
 
 
-    $.Topic(Logscape.Explorer.Topics.setFileContent).subscribe(function(content ) {
+    $.Topic(Logscape.Explorer.Topics.setFileContent).subscribe(function(content) {
+        $("#explorerOpenFileName").get(0).scrollIntoView();
         editor.setValue(content)
     })
 

@@ -57,6 +57,14 @@ public class QueryResource implements FileMetaDataQueryService {
         return uploader.get(cloudRegion, fileMeta.getStorageUrl());
     }
 
+    @GET
+    @Path("/getDownloadUrl/{tenant}/{filename}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public String getDownloadUrl(@PathParam("tenant") String tenant, @PathParam("filename")  String filename) {
+        FileMeta fileMeta = query.find(tenant, filename);
+        return uploader.getSignedDownloadURL(cloudRegion, fileMeta.getStorageUrl());
+    }
+
     /**
      * Note - using pathparams to enable GET request opening/downloading in browser tab
      * @param tenant

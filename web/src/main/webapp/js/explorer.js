@@ -17,15 +17,15 @@ $(document).ready(function () {
 
     let fileList = new Logscape.Explorer.FileList($('#explorerFileListTable'));
 
-    let editor = ace.edit("explorerEditor");
-    editor.setTheme("ace/theme/monokai");
-    editor.session.setMode("ace/mode/javascript");
-    editor.session.setUseWrapMode(true);
+    let aceEditor = ace.edit("explorerEditor");
+    aceEditor.setTheme("ace/theme/monokai");
+    aceEditor.session.setMode("ace/mode/javascript");
+    aceEditor.session.setUseWrapMode(true);
 
 
     $.Topic(Logscape.Explorer.Topics.setFileContent).subscribe(function(content) {
         $("#explorerOpenFileName").get(0).scrollIntoView();
-        editor.setValue(content)
+        aceEditor.setValue(content)
     })
 
 
@@ -63,6 +63,7 @@ $(document).ready(function () {
                   editor.addClass(mediumClass)
               }
             }
+            aceEditor.resize()
             $("#explorerOpenFileName").get(0).scrollIntoView();
             return false;
     })

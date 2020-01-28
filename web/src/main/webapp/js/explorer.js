@@ -7,6 +7,9 @@ Logscape.Explorer.Topics = {
     setFileContent: 'explorerSetFileContent',
     importFromStorage: 'importFromStorage',
     importedFromStorage: 'importedFromStorage',
+    removeImportFromStorage: 'removeImportFromStorage',
+    removedImportFromStorage: 'removedImportFromStorage',
+
     downloadFileContent: 'explorerDownloadFileContent'
 }
 

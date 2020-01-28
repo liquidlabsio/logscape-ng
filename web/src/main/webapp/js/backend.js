@@ -79,6 +79,18 @@ class RestVersion extends FilesInterface {
 //              })
 
     }
+      removeImportFromStorage(storageId, tags, includeFileMask) {
+                $.get(LOGSCAPE_URL + '/storage/removeImported', {tenant:DEFAULT_TENANT, storageId: storageId, includeFileMask: includeFileMask, tags: tags},
+                    function(response) {
+                        $.Topic(Logscape.Explorer.Topics.removedImportFromStorage).publish(response);
+                    })
+    //            .error(function (xhr, ajaxOptions, thrownError) {
+    //                        alert(xhr.status);
+    //                        alert(thrownError);
+    //              })
+
+        }
+
     fileContents(filename) {
             $.get(LOGSCAPE_URL + '/query/get', {tenant:DEFAULT_TENANT, filename: filename, download: true},
                 function(response) {
@@ -118,6 +130,9 @@ function binding () {
 
     $.Topic(Logscape.Explorer.Topics.importFromStorage).subscribe(function(storageId, includeFileMask, tags) {
         backend.importFromStorage(storageId, includeFileMask, tags);
+    })
+    $.Topic(Logscape.Explorer.Topics.removeImportFromStorage).subscribe(function(storageId, includeFileMask, tags) {
+        backend.removeImportFromStorage(storageId, includeFileMask, tags);
     })
 
 }

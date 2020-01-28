@@ -16,9 +16,27 @@ $(document).ready(function () {
         return false;
     })
 
+
+    $("#removeFromStorageButton").click(function(event) {
+        let inputs = $("#dataImportForm").serializeArray();
+
+        if (inputs[0].value.length == 0 || inputs[1].value.length == 0 || inputs[2].value.length == 0) {
+            alert("Please provide values for all 3 inputs")
+            return false;
+        }
+        $.Topic(Logscape.Explorer.Topics.removeImportFromStorage).publish(
+                inputs[0].value, inputs[1].value, inputs[2].value
+        );
+
+    })
+
    $.Topic(Logscape.Explorer.Topics.importedFromStorage).subscribe(function(event) {
-        alert("Stuff was imported:" + event)
+        alert("Data was imported:" + event)
    })
+      $.Topic(Logscape.Explorer.Topics.removedImportFromStorage).subscribe(function(event) {
+           alert("Data was un-imported:" + event)
+      })
+
 
   $("#fileupload").attr("data-url", LOGSCAPE_URL + '/storage/upload')
   $("#fileupload").fileupload({

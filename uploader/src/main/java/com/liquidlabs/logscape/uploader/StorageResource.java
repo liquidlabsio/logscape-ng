@@ -70,23 +70,20 @@ public class StorageResource {
 
     @GET
     @Path("/import")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public List<FileMeta> importFromStorage(@QueryParam("tenant") String tenant, @QueryParam("storageId") String storageId, @QueryParam("includeFileMask") String includeFileMask,  @QueryParam("tags") String tags) {
+    public List<FileMeta> importFromStorage(@QueryParam("tenant") String tenant, @QueryParam("storageId") String storageId,
+                                            @QueryParam("includeFileMask") String includeFileMask,  @QueryParam("tags") String tags) {
         List<FileMeta> imported = uploader.importFromStorage(cloudRegion, tenant, storageId, includeFileMask, tags);
         imported.stream().forEach(fileMeta -> query.put(indexer.index(fileMeta, cloudRegion)));
         return imported;
     }
     @GET
-    @Path("/importStorage")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Path("/removeImported")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<FileMeta> removeByStorageId(@QueryParam("tenant") String tenant, @QueryParam("storageId") String storageId, @QueryParam("includeFileMask") String includeFileMask) {
+    public List<FileMeta> removeByStorageId(@QueryParam("tenant") String tenant, @QueryParam("storageId") String storageId,
+                                            @QueryParam("includeFileMask") String includeFileMask) {
         List<FileMeta> removed = uploader.removeByStorageId(cloudRegion, tenant, storageId, includeFileMask);
-
-        removed.stream().forEach(fileMeta -> query.delete(fileMeta.getTenant(), fileMeta.getFilename())
-        );
-
+        removed.stream().forEach(fileMeta -> query.delete(fileMeta.getTenant(), fileMeta.getFilename()));
         return removed;
     }
 

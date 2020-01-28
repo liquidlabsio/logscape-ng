@@ -1,6 +1,6 @@
   AWSTemplateFormatVersion: '2010-09-09'
   Transform: AWS::Serverless-2016-10-31
-  Description: Serverless Log storage and analysis - liquidlabs::logscape
+  Description: Serverless log storage and analysis - liquidlabs::logscape
   Globals:
     Api:
       EndpointConfiguration: REGIONAL

@@ -8,6 +8,7 @@ if (typeof Logscape == 'undefined') {
                 delay: 500
             });
 
+
     Logscape = {
         Explorer: {},
 

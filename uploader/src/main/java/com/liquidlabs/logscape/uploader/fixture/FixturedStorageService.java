@@ -5,7 +5,9 @@ import com.liquidlabs.logscape.uploader.Storage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FixturedStorageService implements Storage {
@@ -27,7 +29,17 @@ public class FixturedStorageService implements Storage {
     }
 
     @Override
-    public byte[] get(String region, String tenant, String storageUrl) {
+    public byte[] get(String region, String storageUrl) {
         return storage.get(storageUrl);
+    }
+
+    @Override
+    public List<FileMeta> importFromStorage(String cloudRegion, String tenant, String storageId, String includeFileMask, String tags) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<FileMeta> removeByStorageId(String cloudRegion, String tenant, String storageId, String includeFileMask) {
+        return new ArrayList<>();
     }
 }

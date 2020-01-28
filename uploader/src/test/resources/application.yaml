@@ -14,6 +14,21 @@ logscape:
     indexer: TEST
     query: TEST
 
+"%dev":
+  logscape:
+    storage:
+      uploader: AWS
+      indexer: AWS
+      query: AWStttt
+  quarkus:
+    dynamodb:
+      sync-client:
+        type: apache
+      aws:
+        region: eu-west-2
+        credentials:
+          type: default
+
 quarkus:
   dynamodb:
     sync-client:

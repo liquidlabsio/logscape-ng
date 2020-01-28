@@ -19,9 +19,7 @@ public class QueryFactoryConverter implements Converter<FileMetaDataQueryService
         if (mode.equalsIgnoreCase(LaunchMode.TEST.name())) {
             return new FixturedFileMetaDataQueryService();
         } else if (mode.equalsIgnoreCase(AWS.CONFIG)) {
-            AwsFileMetaDataQueryService awsFileMetaDataQueryService = new AwsFileMetaDataQueryService();
-            awsFileMetaDataQueryService.bind();
-            return awsFileMetaDataQueryService;
+            return new AwsFileMetaDataQueryService();
         }
         return new FixturedFileMetaDataQueryService();
     }

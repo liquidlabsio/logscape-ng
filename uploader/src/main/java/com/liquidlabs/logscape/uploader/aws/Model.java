@@ -28,6 +28,7 @@ public class Model {
                                     .as(secondarySortKey("files_by_time"), secondarySortKey("files_by_resource"))    // Sort key for both the LSI and the GSI
                             ,string(Fields.storageUrl.name(), FileMeta::getStorageUrl, FileMeta::setStorageUrl)
                             ,longNumber(Fields.fromTime.name(), FileMeta::getFromTime, FileMeta::setFromTime)
+                            ,longNumber(Fields.size.name(), FileMeta::getSize, FileMeta::setSize)
                             ,string(Fields.tags.name(), FileMeta::getTags, FileMeta::setTags)
                     )
                     .build();

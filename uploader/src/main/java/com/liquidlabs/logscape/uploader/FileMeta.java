@@ -35,7 +35,7 @@ public class FileMeta {
     }
 
     // This is used to help with ORM mappings
-    public enum Fields { filename, fileContent, tenant, resource, tags, storageUrl, fromTime, toTime}
+    public enum Fields { filename, fileContent, tenant, resource, tags, storageUrl, fromTime, toTime, size}
 
     @FormParam("filename")
     @PartType(MediaType.TEXT_PLAIN)
@@ -172,5 +172,13 @@ public class FileMeta {
 
     public void setStorageUrl(String storageUrl) {
         this.storageUrl = storageUrl;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public long getSize() {
+        return size;
     }
 }

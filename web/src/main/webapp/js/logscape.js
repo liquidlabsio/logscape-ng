@@ -1,5 +1,13 @@
 if (typeof Logscape == 'undefined') {
     console.log("Logscape created")
+
+    // initialize bootstrap tooltips
+    $('[data-toggle="tooltip"]').tooltip(
+            {
+                placement : 'bottom',
+                delay: 500
+            });
+
     Logscape = {
         Explorer: {},
 

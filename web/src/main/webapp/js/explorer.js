@@ -5,6 +5,11 @@ Logscape.Explorer.Topics = {
     setListFiles: 'explorerSetListFiles',
     getFileContent: 'explorerGetFileContent',
     setFileContent: 'explorerSetFileContent',
+    importFromStorage: 'importFromStorage',
+    importedFromStorage: 'importedFromStorage',
+    removeImportFromStorage: 'removeImportFromStorage',
+    removedImportFromStorage: 'removedImportFromStorage',
+
     downloadFileContent: 'explorerDownloadFileContent'
 }
 
@@ -55,16 +60,25 @@ Logscape.Explorer.FileList = function (table) {
             })
     }
 
-    table.click(function (event) {
+    $('#explorerFileListTable').on('click','td', function (event) {
         try {
-            let filename = event.target.parentElement.childNodes[0].childNodes[0].nodeValue;
+            let filename = dataTable.api().row( this ).data().filename;
+            let cell = dataTable.api().cell( this )
+            let action = $(event.target).data().action
 
-            $("#explorerOpenFileName").text("Filename: " + filename)
-            $.Topic(Logscape.Explorer.Topics.getFileContent).publish(filename)
-            return false;
+            if (action == "view") {
+                $("#explorerOpenFileName").text("Filename: " + filename)
+                $.Topic(Logscape.Explorer.Topics.getFileContent).publish(filename)
+            } else if (action == "download"){
+                $.Topic(Logscape.Explorer.Topics.downloadFileContent).publish(filename)
+            } else {
+                $("#explorerOpenFileName").text("Filename: " + filename)
+                $.Topic(Logscape.Explorer.Topics.getFileContent).publish(filename)
+            }
         } catch (err) {
             console.log(err.stack)
         }
+        return false;
     })
 
     $.Topic(Logscape.Explorer.Topics.setListFiles).subscribe(function (listing) {
@@ -84,27 +98,14 @@ Logscape.Explorer.FileList = function (table) {
                 item.from = new Date(item.fromTime).toLocaleString();
                 item.to =  new Date(item.toTime).toLocaleString();
                 item.actions =
-                    "<a class='fas fa-eye btn btn-link explorerFileActions view' data-filename='" + item.filename + "' href='#' title='View'></a>"+
-                    "<a class='fas fa-search btn btn-link explorerFileActions' data-filename='" + item.filename + "' href='#' title='Search against this'></a>"+
-                    "<a class='fas fa-times btn btn-link explorerFileActions' data-filename='" + item.filename + "' href='#' title='Delete'></a>"+
-                    "<a class='fas fa-cloud-download-alt btn btn-link explorerFileActions download' data-filename='" + item.filename + "' href='#' title='Download'></a> "
+                    "<a class='fas fa-eye btn btn-link explorerFileActions view' data-action='view' data-filename='" + item.filename + "' href='#' title='View'></a>"+
+                    "<a class='fas fa-search btn btn-link explorerFileActions' data-action='search' data-filename='" + item.filename + "' href='#' title='Search against this'></a>"+
+                    "<a class='fas fa-times btn btn-link explorerFileActions' data-action='delete' data-filename='" + item.filename + "' href='#' title='Delete'></a>"+
+                    "<a class='fas fa-cloud-download-alt btn btn-link explorerFileActions download' data-action='download' data-filename='" + item.filename + "' href='#' title='Download'></a> "
             })
             dataTable.fnAddData(listing)
             sources = listing.files
         }
-
-        $(".explorerFileActions").unbind();
-        $(".explorerFileActions.view").click(function(event){
-                    let filename = $(event.currentTarget).data().filename;
-                    $("#explorerOpenFileName").text("Filename: " + filename)
-                    $.Topic(Logscape.Explorer.Topics.getFileContent).publish(filename)
-        });
-
-        $(".explorerFileActions.download").click(function(event){
-                    let filename = $(event.currentTarget).data().filename;
-                    $.Topic(Logscape.Explorer.Topics.downloadFileContent).publish(filename)
-        });
-
     }
 
     function refreshIt() {

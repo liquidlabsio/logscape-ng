@@ -51,17 +51,14 @@ Data can be uploaded, or better yet it already exists in Cloud Storage (S3, CFG 
 
 #### AWS Deployment
 
-Reference: https://quarkus.io/guides/amazon-lambda-http
-
 Prerequisites: 
 - Install AWS SAM: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html
 - Install the AWS cli. I used version 2.0 - i.e. all cli commands are `> aws2 --stuff--`
-
-**Notes:**
-This approach uses the AWS Gateway Proxy (i.e. the Gateway passes through everything). Quarkus has a HTTP handler embedded in the Lambda the calls on the RX Rest endpoint locally.
-
-1. Setup credentials for AWS account so that SAM user so that Cloudformation etc is available. Brute force unsecure json as follows: <br>
+- AWS account for the SAM user such that Cloudformation etc is available. Brute force unsecure json as follows: <br>
     **IAM -> User (x) -> inline-policy **
+- Create an S3 bucket for lambda-code archive deployment (put that name into env.sh) <YOUR_S3_BUCKET>
+
+
 ```json
 {
     "Version": "2012-10-17",
@@ -81,7 +78,24 @@ This approach uses the AWS Gateway Proxy (i.e. the Gateway passes through everyt
     ]
 }
 ```
-1. Create an S3 bucket for lambda-code archive deployment <YOUR_S3_BUCKET>
+
+#### Scripted
+1. $ cd logscape-ng/etc
+1. edit env.sh with S3 bucket, tenant information etc
+1. $ ./deploy-backend.sh
+1. edit env.sh with APIGateway address
+1. $ ./deploy-frontend.sh 
+1. S3 cp generally fails so change to ./temp-web-package and 'aws2 s3 cp . s3://<BUCKET> --recurvise' files again
+1. Point your browser to the URL in this message 'Point your browser to:'
+1. Username:anything@logscape.com pwd: 'secret'
+
+#### Manual
+
+Reference: https://quarkus.io/guides/amazon-lambda-http
+
+
+**Notes:**
+This approach uses the AWS Gateway Proxy (i.e. the Gateway passes through everything). Quarkus has a HTTP handler embedded in the Lambda the calls on the RX Rest endpoint locally.
 1. Create the logscape fat jar <br>
  `$ mvn clean install` ->
  `target/logscape-0.1-SNAPSHOT-runner.jar`<br>

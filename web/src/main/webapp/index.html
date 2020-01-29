@@ -8,7 +8,7 @@
       <meta name="description" content="">
       <meta name="author" content="Neil Avery">
       <meta name="generator" content="Jekyll v3.8.6">
-      <title>Logscape Cloud File Explorer</title>
+      <title>Logscape Cloud</title>
 
       <!-- Bootstrap core CSS -->
       <link href="css/bootstrap.min.css" rel="stylesheet"
@@ -54,11 +54,14 @@
   <body>
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Logscape Cloud</a>
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="https://github.com/liquidlabsio/logscape-ng" target="_blank" style="padding:5px">
+            <img src="img/logscape-white-hor-logo.png" alt="" width="140">
+        </a>
+
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
         <ul class="navbar-nav px-3">
             <li class="nav-item text-nowrap">
-                <a class="nav-link" href="#">Sign out</a>
+                <a id="signout" class="nav-link" href="#">Sign out</a>
             </li>
         </ul>
     </nav>
@@ -76,7 +79,7 @@
 
                             <a class="nav-link active expanded" href="#" data-target="explorerTab">
                                 <span data-feather="layers"></span>
-                                Explorer <span class="sr-only">(current)</span>
+                                Explore <span class="sr-only">(current)</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -149,7 +152,7 @@
             <main role="main" id="mainPanel" class="col-md-10 ml-sm-auto col-lg-10 px-4">
                 <div id="explorerTab" class="mainPanelTab" style="display: none;">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Explorer</h1>
+                        <h1 class="h2">Explore</h1>
                         <div class="btn-toolbar mb-2 mb-md-0">
                             <div class="btn-group mr-2">
                                 <button id="refreshFiles" type="button" class="btn btn-sm btn-outline-secondary">Refresh</button>

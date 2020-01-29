@@ -1,4 +1,47 @@
 
+![Image description](img/logscape-logo-hor.png)
+
+# What is it?
+
+Cloud native, serverless log analysis runtime that uses the latest technologies to run at minimum cost on the Cloud. 
+Logging is expensive; this tool is meant to be cheap and simple. It provides basic 
+functionality that most people need. 
+* upload data to storage
+* import existing storeage data
+* then enrich it with meta data (i.e. human readable tags)
+* find it by the tags and view the raw data
+* search, like a distributed grep
+
+Because it processes data on a storage layer, it is considered a batch system. 
+Storage chunks are immutable, and periodically written. It is not realtime (more like slow-time). 
+If you want streaming realtime correlations and alerts etc then look elsewhere. That is an upstream problem.
+ (although there are plans to explore what that looks like using Apache Kafka and Confluent Cloud) 
+
+## Technology
+1. Quarkus - a Java container providing the best of breed tools/frameworks from the Java ecosystem. They compile down to GraalVM is - Java-native microkernel without the traditional Java overhead
+2. Serverless functions. Using the AWS-Lambda extension, API calls are delegated through the APIGateway (proxy) to call onto a Serverless function instance.
+3. Cloud native storage: S3, GFS etc
+4. Cloud native DB (AWS:DynamoDB)
+5. Static web-tier from storage layer (the front end is hosts on S3 etc) and calls to the REST API
+ that is part of the APIGateway that delegates to the Serverless function. Much of this call complexity is handled by Quarkus extensions (i.e. lambda-http, resteasy etc)
+
+# Why another logging tool?
+
+Because you can never have enough! 
+Seriously though, Logscape runs in your VPC. This means you own the total 
+cost of infrastructure. It is designed to run serverless in the most optimial 
+way possible; mostly running in the free tier on supported cloud providers
+ (currently AWS). When not in use you only pay for S3/GFS storage (which is relatively cheap). 
+ When executing tasks, Serverless functions are executed to handle the work, and then they shutdown.
+ 
+ 
+
+# How do I get data into it?
+Data can be uploaded, or better yet it already exists in Cloud Storage (S3, CFG etc). To import external data you will need to look at Flume or logstash/beats - then make them write to S3.
+
+
+# Building
+
 #### Dev Mode on local machine against AWS
 * $ cd uploader
 * $ ./mvnw compile quarkus:dev

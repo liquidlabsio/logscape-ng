@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Serverless Log storage and analysis - liquidlabs::logscape
+Description: Serverless log storage and analysis - liquidlabs::logscape
 Globals:
   Api:
     EndpointConfiguration: REGIONAL
@@ -12,7 +12,7 @@ Resources:
     Properties:
       Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
       Runtime: java8
-      CodeUri: s3://logscape-runtime-test/6b82b7f7821d682cfa43ab2e13178d0d
+      CodeUri: s3://logscape-runtime-test/03eb33df2f4400a908d85194bce092b7
       MemorySize: 512
       Policies: AWSLambdaFullAccess
       Timeout: 15

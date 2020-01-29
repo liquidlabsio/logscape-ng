@@ -57,14 +57,11 @@ public class StorageResource {
             query.put(stored);
 
             Response.ResponseBuilder responseBuilder = Response.status(200).entity("Uploaded and Indexed:" + stored);
-            responseBuilder.header("Access-Control-Allow-Origin", "*");
             return responseBuilder.build();
         } catch (Exception ex) {
             log.error("Error handling request:" + fileMeta, ex);
             Response.ResponseBuilder responseBuilder = Response.status(500).entity(ex.getMessage());
-            responseBuilder.header("Access-Control-Allow-Origin", "*");
             return responseBuilder.build();
-
         }
     }
 

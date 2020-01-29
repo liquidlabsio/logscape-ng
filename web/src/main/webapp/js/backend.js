@@ -1,5 +1,15 @@
 
 $(document).ready(function () {
+$.ajaxSetup({
+    crossDomain: true
+//    ,
+//    xhrFields: {
+//        withCredentials: true
+//    },
+//    username: 'test',
+//    password: 'test'
+});
+
     binding()
 
 });

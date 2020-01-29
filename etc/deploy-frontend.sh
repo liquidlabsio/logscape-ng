@@ -36,8 +36,8 @@ cd $TEMP_DIR/js
 echo "Step 2 - Configuring REST API in js/backend.js"
 echo "========================"
 
-mv backend.js backend.js.BAK
-echo "LOGSCAPE_URL = '$LOGSCAPE_API'" > backend.js
+mv logscape.js logscape.js.BAK
+echo "LOGSCAPE_URL = '$LOGSCAPE_API'" > logscape.js
 sed '1d' logscape.js.BAK >> logscape.js
 
 

@@ -113,9 +113,16 @@ Logscape UI
 #explorerFileListTable {
   padding: 10px;
 }
-#explorerEditor {
-  height: 400px;
+.normalSizeEditor {
+ height: 400px;
 }
+.mediumSizeEditor {
+ height: 600px;
+}
+.largeSizeEditor {
+ height: 900px;
+}
+
 
 /**
 File upload UI
@@ -139,4 +146,8 @@ File upload UI
 
 .file-upload-label {
     width: 180px;
+}
+
+.navCompressed {
+  width: 45px;
 }

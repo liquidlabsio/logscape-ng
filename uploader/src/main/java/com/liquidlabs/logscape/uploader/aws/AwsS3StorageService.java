@@ -1,6 +1,7 @@
 package com.liquidlabs.logscape.uploader.aws;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -205,6 +206,35 @@ public class AwsS3StorageService implements Storage {
             S3ObjectInputStream inputStream = s3object.getObjectContent();
 
             return IOUtils.toByteArray(inputStream);
+
+        } catch (Exception e) {
+            log.error("Failed to retrieve {}", storageUrl, e);
+            throw new RuntimeException(e);
+        }
+    }
+    @Override
+    public String getSignedDownloadURL(String region, String storageUrl) {
+        bind();
+
+        try {
+            URI uri = new URI(storageUrl);
+            String bucket = uri.getHost();
+            String filename = uri.getPath().substring(1);
+
+            AmazonS3 s3Client = getAmazonS3Client(region);
+
+            // Set the pre-signed URL to expire after one hour.
+            java.util.Date expiration = new java.util.Date();
+            long expTimeMillis = expiration.getTime();
+            expTimeMillis += 1000 * 60 * 60;
+            expiration.setTime(expTimeMillis);
+
+            // Generate the pre-signed URL.
+            GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                    new GeneratePresignedUrlRequest(bucket, filename)
+                            .withMethod(HttpMethod.GET)
+                            .withExpiration(expiration);
+            return s3Client.generatePresignedUrl(generatePresignedUrlRequest).toString();
 
         } catch (Exception e) {
             log.error("Failed to retrieve {}", storageUrl, e);

@@ -38,14 +38,14 @@ echo "========================"
 
 mv backend.js backend.js.BAK
 echo "LOGSCAPE_URL = '$LOGSCAPE_API'" > backend.js
-sed '1d' backend.js.BAK >> backend.js
+sed '1d' logscape.js.BAK >> logscape.js
 
 
 echo "Step 3 - Configuring TENANT_S3 BUCKET in js/backend.js"
 echo "========================"
 
-mv backend.js backend.js.BAK.2
-sed "s/DEFAULT_TENANT=.*/"DEFAULT_TENANT=\"${S3_TENANT_BUCKET}"\"/" backend.js.BAK.2 > backend.js
+mv logscape.js logscape.js.BAK.2
+sed "s/DEFAULT_TENANT=.*/"DEFAULT_TENANT=\"${S3_TENANT_BUCKET}"\"/" logscape.js.BAK.2 > logscape.js
 
 
 echo "Step 4 - Publishing to S3 Bucket:" + $S3_BUCKET

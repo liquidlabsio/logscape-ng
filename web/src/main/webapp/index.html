@@ -8,7 +8,7 @@
       <meta name="description" content="">
       <meta name="author" content="Neil Avery">
       <meta name="generator" content="Jekyll v3.8.6">
-      <title>Logscape Cloud File Explorer</title>
+      <title>Logscape Cloud</title>
 
       <!-- Bootstrap core CSS -->
       <link href="css/bootstrap.min.css" rel="stylesheet"
@@ -54,73 +54,105 @@
   <body>
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Logscape Cloud</a>
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="https://github.com/liquidlabsio/logscape-ng" target="_blank" style="padding:5px">
+            <img src="img/logscape-white-hor-logo.png" alt="" width="140">
+        </a>
+
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
         <ul class="navbar-nav px-3">
             <li class="nav-item text-nowrap">
-                <a class="nav-link" href="#">Sign out</a>
+                <a id="signout" class="nav-link" href="#">Sign out</a>
             </li>
         </ul>
     </nav>
 
     <div class="container-fluid">
         <div class="row">
-            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav id="sideNav" class="col-md-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#" data-target="explorerTab">
+                            <a class="nav-link active compressed" href="#" data-target="explorerTab">
                                 <span data-feather="layers"></span>
-                                Explorer <span class="sr-only">(current)</span>
+                                <span class="sr-only">(current)</span>
+                            </a>
+
+                            <a class="nav-link active expanded" href="#" data-target="explorerTab">
+                                <span data-feather="layers"></span>
+                                Explore <span class="sr-only">(current)</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" data-target="importTab">
-                                <span data-feather="file-text"></span>
+                            <a class="nav-link compressed" href="#" data-target="importTab">
+                                <span data-feather="upload-cloud"></span>
+                            </a>
+                            <a class="nav-link expanded" href="#" data-target="importTab">
+                                <span data-feather="upload-cloud"></span>
                                 Import
                             </a>
+
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link compressed" href="#">
+                                <span data-feather="bar-chart-2"></span>
+                            </a>
+                            <a class="nav-link expanded" href="#">
                                 <span data-feather="bar-chart-2"></span>
                                 Reports
                             </a>
+
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link compressed" href="#">
+                                <span data-feather="home"></span>
+                            </a>
+                            <a class="nav-link expanded" href="#">
                                 <span data-feather="home"></span>
                                 Integrations
                             </a>
+
                         </li>
                     </ul>
 
-                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>Configuration</span>
-                        <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
-                            <span data-feather="plus-circle"></span>
+                    <h7 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted compressed">
+                        <span class="compressed">...</span>
+                        <a class="d-flex align-items-center text-muted compressed" href="#" aria-label="Add a new report">
+                        </a>
+                    </h7>
+
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted expanded">
+                        <span class="expanded">Configuration</span>
+                        <a class="d-flex align-items-center text-muted expanded" href="#" aria-label="Add a new report">
+                            <span class="expanded" data-feather="plus-circle"></span>
                         </a>
                     </h6>
                     <ul class="nav flex-column mb-2">
                         <li class="nav-item">
-                            <a class="nav-link" href="#" data-target="configuration">
-                                <span data-feather="file-text"></span>
-                                Configure
+                            <a class="nav-link compressed" href="#" data-target="configuration">
+                                <span data-feather="settings"></span>
+                            </a>
+                            <a class="nav-link expanded" href="#" data-target="configuration">
+                                <span data-feather="settings"></span>
+                                Installation
                             </a>
                         </li>
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link" href="#">-->
-<!--                                <span data-feather="file-text"></span>-->
-<!--                                Last quarter-->
-<!--                            </a>-->
-<!--                        </li>-->
+
+                        <li class="nav-item">
+                            <a class="compressed" id="expandNav" href="#">
+                                <span data-feather="chevrons-right"></span>
+                            </a>
+                            <a class="expanded" id="compressNav" href="#">
+                                <span data-feather="chevrons-left"></span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>
 
-            <main role="main" class="col-md-10 ml-sm-auto col-lg-10 px-4">
+            <main role="main" id="mainPanel" class="col-md-10 ml-sm-auto col-lg-10 px-4">
                 <div id="explorerTab" class="mainPanelTab" style="display: none;">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Explorer</h1>
+                        <h1 class="h2">Explore</h1>
                         <div class="btn-toolbar mb-2 mb-md-0">
                             <div class="btn-group mr-2">
                                 <button id="refreshFiles" type="button" class="btn btn-sm btn-outline-secondary">Refresh</button>
@@ -148,8 +180,14 @@
                             </thead>
                         </table>
                     </div>
-                  <h4 id="explorerOpenFileName">Filename: []</h4>
-                  <div id="explorerEditor">
+                        <h5 id="explorerOpenFileName">Filename: []</h5>
+                        <a class="zoomExplorer" data-zoom="in" href="#">
+                            <span data-feather="zoom-in"></span>
+                        </a>
+                        <a class="zoomExplorer" data-zoom="out" href="#">
+                            <span data-feather="zoom-out"></span>
+                        </a>
+                  <div id="explorerEditor" class="normalSizeEditor">
                   </div>
                 </div>
 
@@ -209,7 +247,7 @@
                                                     </div>
                                                     <div class="custom-file">
                                                         <input type="file" name="fileContent" class="custom-file-input" id="fileupload" multiple >
-                                                        <label class="custom-file-label" for="fileupload">Choose file</label>
+                                                        <label class="custom-file-label" for="fileupload">Choose files</label>
                                                     </div>
                                                 </div>
 
@@ -280,25 +318,18 @@
                                                         data-toggle="tooltip"
                                                         title="Removes imported data but leaves source data untouched">Un-import</button>
                                             </div>
-
                                             <br>
                                         </form>
-
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-
-
-
-
-
                     </div>
                 </div>
                 <div id="configuration"  class="mainPanelTab" style="display: none;">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Configuration (read-only)</h1>
+                        <h1 class="h2">Installation Settings (read-only)</h1>
                     </div>
                     <div>
                         <form class="form-group">
@@ -347,6 +378,7 @@
     <script src="https://pagecdn.io/lib/ace/1.4.7/worker-javascript.js" crossorigin="anonymous"></script>
     <script src="https://pagecdn.io/lib/ace/1.4.7/worker-json.js" crossorigin="anonymous"></script>
 
+    <script src="https://cdn.jsdelivr.net/pako/1.0.3/pako.min.js" crossorigin="anonymous"></script>
     <!-- file upload ui -->
     <script src="js/vendor/jquery.ui.widget.js"></script>
     <script src="js/vendor/jquery.iframe-transport.js"></script>

@@ -17,13 +17,15 @@ $(document).ready(function () {
 
     let fileList = new Logscape.Explorer.FileList($('#explorerFileListTable'));
 
-    let editor = ace.edit("explorerEditor");
-    editor.setTheme("ace/theme/monokai");
-    editor.session.setMode("ace/mode/javascript");
+    let aceEditor = ace.edit("explorerEditor");
+    aceEditor.setTheme("ace/theme/monokai");
+    aceEditor.session.setMode("ace/mode/javascript");
+    aceEditor.session.setUseWrapMode(true);
 
 
-    $.Topic(Logscape.Explorer.Topics.setFileContent).subscribe(function(content ) {
-        editor.setValue(content)
+    $.Topic(Logscape.Explorer.Topics.setFileContent).subscribe(function(content) {
+        $("#explorerOpenFileName").get(0).scrollIntoView();
+        aceEditor.setValue(content)
     })
 
 
@@ -31,6 +33,41 @@ $(document).ready(function () {
         $.Topic(Logscape.Explorer.Topics.getListFiles).publish("doit")
     });
     $.Topic(Logscape.Explorer.Topics.getListFiles).publish("get file list on page load")
+
+    $('.zoomExplorer').click(function(event){
+            let zoomDirection = $(event.currentTarget).data().zoom;
+
+//            console.log(dd)
+            let normalClass = "normalSizeEditor";
+            let mediumClass = "mediumSizeEditor";
+            let largeClass = "largeSizeEditor";
+            let editor = $('#explorerEditor')
+            if (editor.hasClass(normalClass)) {
+                if (zoomDirection == "in") {
+                    editor.removeClass(normalClass)
+                    editor.addClass(mediumClass)
+                } else {
+                // already at normal size
+                }
+            } else if (editor.hasClass(mediumClass)) {
+                editor.removeClass(mediumClass)
+                if (zoomDirection == "in") {
+                    editor.addClass(largeClass)
+                } else {
+                    editor.addClass(normalClass)
+                }
+            } else if (editor.hasClass(largeClass)) {
+              if (zoomDirection == "in") {
+              } else {
+                 editor.removeClass(largeClass)
+                  editor.addClass(mediumClass)
+              }
+            }
+            aceEditor.resize()
+            $("#explorerOpenFileName").get(0).scrollIntoView();
+            return false;
+    })
+
 });
 
 Logscape.Explorer.FileList = function (table) {

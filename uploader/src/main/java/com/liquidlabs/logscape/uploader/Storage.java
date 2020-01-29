@@ -16,4 +16,6 @@ public interface Storage {
     List<FileMeta> importFromStorage(String cloudRegion, String tenant, String storageId, String includeFileMask, String tags);
 
     List<FileMeta> removeByStorageId(String cloudRegion, String tenant, String storageId, String includeFileMask);
+
+    String getSignedDownloadURL(String region, String storageUrl);
 }

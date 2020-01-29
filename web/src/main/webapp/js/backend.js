@@ -1,7 +1,3 @@
-LOGSCAPE_URL = 'http://0.0.0.0:8080'
-DEFAULT_TENANT='logscape-test-storage'
-//LOGSCAPE_URL = 'https://5er31crao2.execute-api.eu-west-2.amazonaws.com/Prod'
-KEY = '5b578yg9yvi8sogirbvegoiufg9v9g579gviuiub8' // not real
 
 $(document).ready(function () {
     binding()
@@ -36,6 +32,25 @@ var fixturedFiles = new Map([
         [testFiles[1].name, testFiles[1]],
     ]
 );
+
+ function downloadBinaryDataFromURL(url, filename){
+        var oReq = new XMLHttpRequest();
+                oReq.open("GET", url, true);
+                oReq.responseType = "blob";
+
+                oReq.onload = function(oEvent) {
+                  let blob = oReq.response;
+                  var reader = new FileReader();
+                  reader.readAsArrayBuffer(blob);
+                  reader.onloadend = (event) => {
+                      var byteArrayStuff = reader.result;
+                      let textyBytes = pako.inflate(byteArrayStuff);
+                      var explodedString = new TextDecoder("utf-8").decode(textyBytes);
+                      $.Topic(Logscape.Explorer.Topics.setFileContent).publish(explodedString);
+                    }
+                  }
+                oReq.send();
+    }
 
 class FilesFixture extends FilesInterface {
 
@@ -91,8 +106,33 @@ class RestVersion extends FilesInterface {
 
         }
 
+
+
+
+/**
+this cannot work unless the client has signed certificates installed - if not a 'net::ERR_CERT_COMMON_NAME_INVALID' is thrown
+**/
+    fileContentsByURL(filename) {
+        $.get(LOGSCAPE_URL + '/query/getDownloadUrl/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename),{},
+            function(response) {
+                if (filename.endsWith(".gz")) {
+                    downloadBinaryDataFromURL(response, filename);
+                } else {
+                 $.get(response,{},
+                    function(response) {
+                        $.Topic(Logscape.Explorer.Topics.setFileContent).publish(response);
+                    })
+                }
+            })
+    }
     fileContents(filename) {
-            $.get(LOGSCAPE_URL + '/query/get', {tenant:DEFAULT_TENANT, filename: filename, download: true},
+        // jquery ajax binary support is missing - use standard JS
+        $.Topic(Logscape.Explorer.Topics.setFileContent).publish("loading...");
+        if (filename.endsWith(".gz")) {
+            let url = LOGSCAPE_URL + '/query/get/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename)
+            downloadBinaryDataFromURL(url, filename);
+        } else {
+            $.get(LOGSCAPE_URL + '/query/get/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename),{},
                 function(response) {
                     $.Topic(Logscape.Explorer.Topics.setFileContent).publish(response);
                 })
@@ -100,6 +140,7 @@ class RestVersion extends FilesInterface {
 //                        alert(xhr.status);
 //                        alert(thrownError);
 //              })
+        }
 
     }
 
@@ -122,6 +163,7 @@ function binding () {
     })
     $.Topic(Logscape.Explorer.Topics.getFileContent).subscribe(function(event) {
         backend.fileContents(event);
+//        backend.fileContentsByURL(event);
     })
 
     $.Topic(Logscape.Explorer.Topics.downloadFileContent).subscribe(function(event) {

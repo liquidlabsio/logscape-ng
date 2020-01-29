@@ -42,4 +42,9 @@ public class FixturedStorageService implements Storage {
     public List<FileMeta> removeByStorageId(String cloudRegion, String tenant, String storageId, String includeFileMask) {
         return new ArrayList<>();
     }
+
+    @Override
+    public String getSignedDownloadURL(String region, String storageUrl) {
+        return "not implemented";
+    }
 }

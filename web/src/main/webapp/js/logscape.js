@@ -1,5 +1,22 @@
+LOGSCAPE_URL = 'http://0.0.0.0:8080'
+DEFAULT_TENANT='logscape-test-storage'
+//LOGSCAPE_URL = 'https://5er31crao2.execute-api.eu-west-2.amazonaws.com/Prod'
+KEY = '5b578yg9yvi8sogirbvegoiufg9v9g579gviuiub8' // not real
+
+function checkUserLogin(){
+    if (window.location.pathname.endsWith("index.html")) {
+        let auth = window.localStorage.getItem("logscape-auth")
+        if (auth == null) {
+            alert("User is not logged in")
+            window.location.href = "signin.html"
+        }
+    }
+}
+
 if (typeof Logscape == 'undefined') {
     console.log("Logscape created")
+
+    checkUserLogin()
 
     // initialize bootstrap tooltips
     $('[data-toggle="tooltip"]').tooltip(
@@ -7,6 +24,7 @@ if (typeof Logscape == 'undefined') {
                 placement : 'bottom',
                 delay: 500
             });
+
 
     Logscape = {
         Explorer: {},

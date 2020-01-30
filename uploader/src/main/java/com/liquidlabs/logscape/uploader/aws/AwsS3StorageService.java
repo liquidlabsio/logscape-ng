@@ -169,7 +169,7 @@ public class AwsS3StorageService implements Storage {
     }
 
     private String getBucketName(String tenant) {
-        return (PREFIX + "." + tenant).toLowerCase();
+        return (PREFIX + "_" + tenant).toLowerCase();
     }
 
     private static AmazonS3 getAmazonS3Client(String region) {

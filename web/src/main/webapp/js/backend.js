@@ -43,27 +43,6 @@ var fixturedFiles = new Map([
     ]
 );
 
- function downloadBinaryDataFromURL(url, filename){
-        var oReq = new XMLHttpRequest();
-                oReq.open("GET", url, true);
-                oReq.responseType = "blob";
-
-                oReq.onload = function(oEvent) {
-
-                    $.Topic(Logscape.Explorer.Topics.setFileContent).publish("expanding gz...");
-                  let blob = oReq.response;
-                  var reader = new FileReader();
-                  reader.readAsArrayBuffer(blob);
-                  reader.onloadend = (event) => {
-                      var byteArrayStuff = reader.result;
-                      let textyBytes = pako.inflate(byteArrayStuff);
-                      var explodedString = new TextDecoder("utf-8").decode(textyBytes);
-                      $.Topic(Logscape.Explorer.Topics.setFileContent).publish(explodedString);
-                    }
-                  }
-                oReq.send();
-    }
-
 class FilesFixture extends FilesInterface {
 
     listFiles() {
@@ -87,84 +66,122 @@ class FilesFixture extends FilesInterface {
 
 class RestVersion extends FilesInterface {
 
+    downloadBinaryDataFromURL(url, filename){
+        $.Topic(Logscape.Explorer.Topics.startSpinner).publish();
+        let self=this;
+        var oReq = new XMLHttpRequest();
+                oReq.open("GET", url, true);
+                oReq.responseType = "blob";
+                oReq.onload = function(oEvent) {
+                    $.Topic(Logscape.Explorer.Topics.setFileContent).publish("expanding gz...");
+                  let blob = oReq.response;
+                  var reader = new FileReader();
+                  reader.readAsArrayBuffer(blob);
+                  reader.onloadend = (event) => {
+                      var byteArrayStuff = reader.result;
+                      let textyBytes = pako.inflate(byteArrayStuff);
+                      var explodedString = new TextDecoder("utf-8").decode(textyBytes);
+                      $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
+                      $.Topic(Logscape.Explorer.Topics.setFileContent).publish(explodedString);
+                    }
+                  }
+                oReq.onerror = function(err) {
+                    let url = LOGSCAPE_URL + '/query/get/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename)
+                    $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
+                    self.downloadBinaryDataFromURL(url, filename);
+                }
+                oReq.send();
+    }
+
     listFiles() {
-        // return files
+        $.Topic(Logscape.Explorer.Topics.startSpinner).publish();
         $.get(LOGSCAPE_URL + '/query/list', {},
             function(response) {
+                $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
                 $.Topic(Logscape.Explorer.Topics.setListFiles).publish(response);
             }
-        )
+        ).fail(function(){
+                $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
+        })
     }
     importFromStorage(storageId, tags, includeFileMask) {
-            $.get(LOGSCAPE_URL + '/storage/import', {tenant:DEFAULT_TENANT, storageId: storageId, includeFileMask: includeFileMask, tags: tags},
-                function(response) {
-                    $.Topic(Logscape.Explorer.Topics.importedFromStorage).publish(response);
-                })
-            .fail(function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-              })
-
+        $.Topic(Logscape.Explorer.Topics.startSpinner).publish();
+        $.get(LOGSCAPE_URL + '/storage/import', {tenant:DEFAULT_TENANT, storageId: storageId, includeFileMask: includeFileMask, tags: tags},
+            function(response) {
+                $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
+                $.Topic(Logscape.Explorer.Topics.importedFromStorage).publish(response);
+            })
+        .fail(function (xhr, ajaxOptions, thrownError) {
+            $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
+            alert(xhr.status);
+            alert(thrownError);
+          })
     }
-      removeImportFromStorage(storageId, tags, includeFileMask) {
-                $.get(LOGSCAPE_URL + '/storage/removeImported', {tenant:DEFAULT_TENANT, storageId: storageId, includeFileMask: includeFileMask, tags: tags},
-                    function(response) {
-                        $.Topic(Logscape.Explorer.Topics.removedImportFromStorage).publish(response);
-                    })
-                .fail(function (xhr, ajaxOptions, thrownError) {
-                            alert(xhr.status);
-                            alert(thrownError);
-                  })
+    removeImportFromStorage(storageId, tags, includeFileMask) {
+        $.Topic(Logscape.Explorer.Topics.startSpinner).publish();
+        $.get(LOGSCAPE_URL + '/storage/removeImported', {tenant:DEFAULT_TENANT, storageId: storageId, includeFileMask: includeFileMask, tags: tags},
+            function(response) {
+                $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
+                $.Topic(Logscape.Explorer.Topics.removedImportFromStorage).publish(response);
+            })
+        .fail(function (xhr, ajaxOptions, thrownError) {
+            $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
+            alert(xhr.status);
+            alert(thrownError);
+          })
+    }
 
-        }
 
-
-
-
-/**
-* The S3 bucket will needs CORS enabled for direct downloads to work. If it fails it retried by using a lambda request
-**/
+    /**
+    * The S3 bucket needs CORS enabled for direct downloads to work. If it fails it retried by using a faas request
+    **/
     fileContentsByURL(filename) {
+        $.Topic(Logscape.Explorer.Topics.startSpinner).publish();
+        let self=this;
         $.Topic(Logscape.Explorer.Topics.setFileContent).publish("loading...");
         $.get(LOGSCAPE_URL + '/query/getDownloadUrl/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename),{},
             function(urlLocation) {
                 try {
                     if (filename.endsWith(".gz")) {
-                        downloadBinaryDataFromURL(urlLocation, filename);
+                        self.downloadBinaryDataFromURL(urlLocation, filename);
+                        $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
                     } else {
                      $.get(urlLocation,{},
                         function(responseContent) {
+                            $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
                             $.Topic(Logscape.Explorer.Topics.setFileContent).publish(responseContent);
                         })
-//                        .fail(function(error, anotherone, more) {
-//                            console.log("Failed to load URL: " + urlLocation + " error:" + error)
-//                            console.log(error)
-//                            console.log("Going to load via Lambda function")
-//                            fileContents(filename)
-//                        })
+                        .fail(function(xhr, ajaxOptions, thrownError) {
+                            $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
+                            $.Topic(Logscape.Explorer.Topics.setFileContent).publish("load by URL failed (CORS disabled) - falling back ... still loading...");
+                            self.fileContents(filename)
+                        })
                     }
                 } catch (err) {
                     console.log("Failed to load by signed URL - reverting to Lambda")
                     $.Topic(Logscape.Explorer.Topics.setFileContent).publish("load by URL failed - falling back ... still loading...");
-
                     fileContents(filename)
                 }
             })
     }
     fileContents(filename) {
-        // jquery ajax binary support is missing - use standard JS
+        $.Topic(Logscape.Explorer.Topics.startSpinner).publish();
+        let self=this;
         $.Topic(Logscape.Explorer.Topics.setFileContent).publish("loading...");
         if (filename.endsWith(".gz")) {
             let url = LOGSCAPE_URL + '/query/get/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename)
-            downloadBinaryDataFromURL(url, filename);
+            self.downloadBinaryDataFromURL(url, filename);
         } else {
             $.get(LOGSCAPE_URL + '/query/get/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename),{},
                 function(response) {
+                    $.Topic(Logscape.Explorer.Topics.stopSpinner).publish();
                     $.Topic(Logscape.Explorer.Topics.setFileContent).publish(response);
                 })
             .fail(function (xhr, ajaxOptions, thrownError) {
                         alert(xhr.status);
                         alert(thrownError);
+                        $.Topic(Logscape.Explorer.Topics.setFileContent).publish("Failed to load file contents:" + thrownError + " status:" + xhr.status);
+
               })
         }
 
@@ -172,9 +189,11 @@ class RestVersion extends FilesInterface {
 
     downloadFileContent(filename) {
         console.log("Downloading:" + LOGSCAPE_URL + '/query/download/' + DEFAULT_TENANT + '/'  + filename)
-            window.open(
-              LOGSCAPE_URL + '/query/download/' + encodeURIComponent(DEFAULT_TENANT) + '/'  + encodeURIComponent(filename)
-            )
+        $.get(LOGSCAPE_URL + '/query/getDownloadUrl/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename),{},
+            function(urlLocation) {
+                console.log("Signed:" + urlLocation)
+                window.open(urlLocation);
+            })
     }
 }
 
@@ -202,6 +221,13 @@ function binding () {
     $.Topic(Logscape.Explorer.Topics.removeImportFromStorage).subscribe(function(storageId, includeFileMask, tags) {
         backend.removeImportFromStorage(storageId, includeFileMask, tags);
     })
+    $.Topic(Logscape.Explorer.Topics.startSpinner).subscribe(function() {
+        $(".spinner").show()
+    })
+    $.Topic(Logscape.Explorer.Topics.stopSpinner).subscribe(function() {
+        $(".spinner").hide()
+    })
+
 
 }
 

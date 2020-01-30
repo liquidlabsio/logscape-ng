@@ -2,7 +2,7 @@
 echo " 1. AWS account with cloud-formation role and credentials installed: ~/.aws/credentials"
 echo " 2. AWS2 CLI installed: see: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux-mac.html"
 echo " 3. AWS SAM installed:  https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install-mac.html "
-echo " 4. Configure the S3 bucket in env.sh (it must be created already)"
+echo " 4. Configure the S3 runtime and tenant buckets in env.sh (it must be created already)"
 . ./env.sh
 
 cd ../uploader

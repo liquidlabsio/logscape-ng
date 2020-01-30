@@ -1,11 +1,11 @@
 
 $(document).ready(function () {
 $.ajaxSetup({
-    crossDomain: true
+//    crossDomain: true
 //    ,
 //    xhrFields: {
 //        withCredentials: true
-//    },
+//    }//,
 //    username: 'test',
 //    password: 'test'
 });
@@ -49,6 +49,8 @@ var fixturedFiles = new Map([
                 oReq.responseType = "blob";
 
                 oReq.onload = function(oEvent) {
+
+                    $.Topic(Logscape.Explorer.Topics.setFileContent).publish("expanding gz...");
                   let blob = oReq.response;
                   var reader = new FileReader();
                   reader.readAsArrayBuffer(blob);
@@ -98,10 +100,10 @@ class RestVersion extends FilesInterface {
                 function(response) {
                     $.Topic(Logscape.Explorer.Topics.importedFromStorage).publish(response);
                 })
-//            .error(function (xhr, ajaxOptions, thrownError) {
-//                        alert(xhr.status);
-//                        alert(thrownError);
-//              })
+            .fail(function (xhr, ajaxOptions, thrownError) {
+                        alert(xhr.status);
+                        alert(thrownError);
+              })
 
     }
       removeImportFromStorage(storageId, tags, includeFileMask) {
@@ -109,10 +111,10 @@ class RestVersion extends FilesInterface {
                     function(response) {
                         $.Topic(Logscape.Explorer.Topics.removedImportFromStorage).publish(response);
                     })
-    //            .error(function (xhr, ajaxOptions, thrownError) {
-    //                        alert(xhr.status);
-    //                        alert(thrownError);
-    //              })
+                .fail(function (xhr, ajaxOptions, thrownError) {
+                            alert(xhr.status);
+                            alert(thrownError);
+                  })
 
         }
 
@@ -120,18 +122,32 @@ class RestVersion extends FilesInterface {
 
 
 /**
-this cannot work unless the client has signed certificates installed - if not a 'net::ERR_CERT_COMMON_NAME_INVALID' is thrown
+* The S3 bucket will needs CORS enabled for direct downloads to work. If it fails it retried by using a lambda request
 **/
     fileContentsByURL(filename) {
+        $.Topic(Logscape.Explorer.Topics.setFileContent).publish("loading...");
         $.get(LOGSCAPE_URL + '/query/getDownloadUrl/' +  encodeURIComponent(DEFAULT_TENANT) + "/" + encodeURIComponent(filename),{},
-            function(response) {
-                if (filename.endsWith(".gz")) {
-                    downloadBinaryDataFromURL(response, filename);
-                } else {
-                 $.get(response,{},
-                    function(response) {
-                        $.Topic(Logscape.Explorer.Topics.setFileContent).publish(response);
-                    })
+            function(urlLocation) {
+                try {
+                    if (filename.endsWith(".gz")) {
+                        downloadBinaryDataFromURL(urlLocation, filename);
+                    } else {
+                     $.get(urlLocation,{},
+                        function(responseContent) {
+                            $.Topic(Logscape.Explorer.Topics.setFileContent).publish(responseContent);
+                        })
+//                        .fail(function(error, anotherone, more) {
+//                            console.log("Failed to load URL: " + urlLocation + " error:" + error)
+//                            console.log(error)
+//                            console.log("Going to load via Lambda function")
+//                            fileContents(filename)
+//                        })
+                    }
+                } catch (err) {
+                    console.log("Failed to load by signed URL - reverting to Lambda")
+                    $.Topic(Logscape.Explorer.Topics.setFileContent).publish("load by URL failed - falling back ... still loading...");
+
+                    fileContents(filename)
                 }
             })
     }
@@ -146,10 +162,10 @@ this cannot work unless the client has signed certificates installed - if not a 
                 function(response) {
                     $.Topic(Logscape.Explorer.Topics.setFileContent).publish(response);
                 })
-//            .error(function (xhr, ajaxOptions, thrownError) {
-//                        alert(xhr.status);
-//                        alert(thrownError);
-//              })
+            .fail(function (xhr, ajaxOptions, thrownError) {
+                        alert(xhr.status);
+                        alert(thrownError);
+              })
         }
 
     }
@@ -172,8 +188,8 @@ function binding () {
         backend.listFiles();
     })
     $.Topic(Logscape.Explorer.Topics.getFileContent).subscribe(function(event) {
-        backend.fileContents(event);
-//        backend.fileContentsByURL(event);
+//        backend.fileContents(event);
+        backend.fileContentsByURL(event);
     })
 
     $.Topic(Logscape.Explorer.Topics.downloadFileContent).subscribe(function(event) {

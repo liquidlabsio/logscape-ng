@@ -12,7 +12,7 @@ Resources:
     Properties:
       Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
       Runtime: java8
-      CodeUri: s3://logscape-runtime-test/03eb33df2f4400a908d85194bce092b7
+      CodeUri: s3://logscape-runtime/aa74378b523b716f391067e0dfeaf324
       MemorySize: 512
       Policies: AWSLambdaFullAccess
       Timeout: 15

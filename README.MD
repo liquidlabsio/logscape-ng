@@ -51,13 +51,22 @@ Data can be uploaded, or better yet it already exists in Cloud Storage (S3, CFG 
 
 #### AWS Deployment
 
+Notes and limits: 
+- If you want data to load quickly to the browser then enable CORS on each S3 bucket and 
+logscape will use a signed URL to download directly from S3 (see etc/s3-cors.xml). 
+If not enabled, then a signed download be tried, and upon failure revert to using a Lambda.
+- The largest browsable file is 100MB before the browser starts to choke on memory (about 250k lines of text) 
+The same file will gzip down to 3.6MB and can be handled by a Function call. AWS Function download limits are limited by lambda return limits -  5MB   
+
 Prerequisites: 
 - Install AWS SAM: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html
 - Install the AWS cli. I used version 2.0 - i.e. all cli commands are `> aws2 --stuff--`
+- Create an S3 bucket for the logscape runtime (lambda-code, front-end website) deployment (put that name into env.sh) <YOUR_S3_BUCKET>
+- Configure the S3 logscape-runtime bucket for static website hosting
 - AWS account for the SAM user such that Cloudformation etc is available. Brute force unsecure json as follows: <br>
-    **IAM -> User (x) -> inline-policy **
-- Create an S3 bucket for lambda-code archive deployment (put that name into env.sh) <YOUR_S3_BUCKET>
-
+    **IAM -> User (x) -> inline-policy ** <BR>
+    IAMFullAccess,   AmazonS3FullAccess,  AmazonDynamoDBFullAccess  
+    AWSCloudFormationFullAccess,  AmazonAPIGatewayAdministrator, AWSLambdaFullAccess
 
 ```json
 {
@@ -88,6 +97,11 @@ Prerequisites:
 1. S3 cp generally fails so change to ./temp-web-package and 'aws2 s3 cp . s3://<BUCKET> --recurvise' files again
 1. Point your browser to the URL in this message 'Point your browser to:'
 1. Username:anything@logscape.com pwd: 'secret'
+
+##### Troubleshooting
+1. Check the deployment user has correct permissions - error message will indicate so
+1. Check the aws2 s3 cp to the runtime bucket worked. If it partially failed the browser debug console will show resources failed to load or endpoints are not correct (failed to connect to address)
+1. Rollback using the cloudformation console
 
 #### Manual
 

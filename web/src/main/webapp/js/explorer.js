@@ -10,7 +10,10 @@ Logscape.Explorer.Topics = {
     removeImportFromStorage: 'removeImportFromStorage',
     removedImportFromStorage: 'removedImportFromStorage',
 
-    downloadFileContent: 'explorerDownloadFileContent'
+    downloadFileContent: 'explorerDownloadFileContent',
+
+    startSpinner: 'startSpinner',
+    stopSpinner: 'stopSpinner'
 }
 
 $(document).ready(function () {

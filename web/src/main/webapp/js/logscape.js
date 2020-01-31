@@ -1,14 +1,19 @@
 LOGSCAPE_URL = 'http://0.0.0.0:8080'
-DEFAULT_TENANT='logscape-test-storage'
-//LOGSCAPE_URL = 'https://5er31crao2.execute-api.eu-west-2.amazonaws.com/Prod'
-KEY = '5b578yg9yvi8sogirbvegoiufg9v9g579gviuiub8' // not real
+DEFAULT_TENANT='logscape-user-data'
 
 function checkUserLogin(){
     if (window.location.pathname.endsWith("index.html")) {
         let auth = window.localStorage.getItem("logscape-auth")
-        if (auth == null) {
+        if (auth == null || auth.length == 0) {
             alert("User is not logged in")
             window.location.href = "signin.html"
+        } else {
+            let timestamp = parseInt(auth.split(":")[0])
+            let sessionAgeHours = (new Date().getTime() - timestamp)/(1000 * 60 * 12);
+            if (sessionAgeHours > 12 /** 12 hours old **/) {
+                alert("Session has expired")
+                window.location.href = "signin.html"
+            }
         }
     }
 }

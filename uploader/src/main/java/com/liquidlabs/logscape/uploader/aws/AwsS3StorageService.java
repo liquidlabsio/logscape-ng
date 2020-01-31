@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.liquidlabs.logscape.uploader.FileMeta;
 import com.liquidlabs.logscape.uploader.Storage;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class AwsS3StorageService implements Storage {
 
+    private static final long LIMIT = (long) (FileUtils.ONE_MB * 4.5);
     private final Logger log = LoggerFactory.getLogger(AwsS3StorageService.class);
 
     @ConfigProperty(name = "logscape.prefix", defaultValue = "logscape.")
@@ -194,8 +197,6 @@ public class AwsS3StorageService implements Storage {
     @Override
     public byte[] get(String region, String storageUrl) {
         bind();
-
-
         try {
             URI uri = new URI(storageUrl);
             String bucket = uri.getHost();
@@ -205,7 +206,10 @@ public class AwsS3StorageService implements Storage {
             S3Object s3object = s3Client.getObject(bucket, filename);
             S3ObjectInputStream inputStream = s3object.getObjectContent();
 
-            return IOUtils.toByteArray(inputStream);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            IOUtils.copyLarge(inputStream, baos, 0, LIMIT);
+            return baos.toByteArray();
 
         } catch (Exception e) {
             log.error("Failed to retrieve {}", storageUrl, e);

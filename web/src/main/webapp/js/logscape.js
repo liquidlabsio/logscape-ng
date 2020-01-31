@@ -9,7 +9,7 @@ function checkUserLogin(){
             window.location.href = "signin.html"
         } else {
             let timestamp = parseInt(auth.split(":")[0])
-            let sessionAgeHours = (new Date().getTime() - timestamp)/(1000 * 60);
+            let sessionAgeHours = (new Date().getTime() - timestamp)/(1000 * 60 * 12);
             if (sessionAgeHours > 12 /** 12 hours old **/) {
                 alert("Session has expired")
                 window.location.href = "signin.html"

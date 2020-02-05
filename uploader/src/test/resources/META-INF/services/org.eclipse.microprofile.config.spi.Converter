@@ -1,3 +1,4 @@
-com.liquidlabs.logscape.uploader.StorageFactoryConverter
-com.liquidlabs.logscape.uploader.IndexingFactoryConverter
-com.liquidlabs.logscape.uploader.QueryFactoryConverter
+com.liquidlabs.logscape.cloud.storage.StorageFactoryConverter
+com.liquidlabs.logscape.cloud.IndexingFactoryConverter
+com.liquidlabs.logscape.cloud.query.QueryFactoryConverter
+com.liquidlabs.logscape.cloud.search.SearchFactoryConverter

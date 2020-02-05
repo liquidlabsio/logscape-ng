@@ -80,12 +80,22 @@
                                 <span data-feather="layers"></span>
                                 <span class="sr-only">(current)</span>
                             </a>
-
                             <a class="nav-link active expanded" href="#" data-target="explorerTab">
                                 <span data-feather="layers"></span>
                                 Explore <span class="sr-only">(current)</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link active compressed" href="#" data-target="searchTab">
+                                <span data-feather="search"></span>
+                                <span class="sr-only"></span>
+                            </a>
+                            <a class="nav-link active expanded" href="#" data-target="searchTab">
+                                <span data-feather="search"></span>
+                                Search <span class="sr-only"></span>
+                            </a>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link compressed" href="#" data-target="importTab">
                                 <span data-feather="upload-cloud"></span>
@@ -196,6 +206,46 @@
                   <div id="explorerEditor" class="normalSizeEditor">
                   </div>
                 </div>
+
+                <div id="searchTab" class="mainPanelTab" style="display: none;">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Search</h1>
+
+
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group mr-2">
+                                <button id="refreshFilesSearch" type="button" class="btn btn-sm btn-outline-secondary">Refresh</button>
+                                <button  type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                                <span data-feather="calendar"></span>
+                                This week
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input id="searchInput" type="text" class="form-control" placeholder="bucket | resource | Filenames filter | line-filter | analytic " aria-label="" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button id="submitSearch" class="btn btn-primary">
+                                <span class="spinner spinner-border spinner-border-sm"></span>
+                                <span data-feather="search"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <h5 id="Search Results">Filename: []</h5>
+                    <a class="zoomExplorer" data-zoom="in" href="#">
+                        <span data-feather="zoom-in"></span>
+                    </a>
+                    <a class="zoomExplorer" data-zoom="out" href="#">
+                        <span data-feather="zoom-out"></span>
+                    </a>
+                    <div id="searchResultsChart" class="searchChart">
+                    <div id="searchResultsEditor" class="normalSizeEditor">
+                    </div>
+                </div>
+
 
                 <div id="importTab"  class="mainPanelTab" style="display: none;">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -342,12 +392,17 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label for="tenantInfo">Tenant Identity</label>
-                                    <input  name="resource"  type="text" class="form-control" id="tenantInfo"  placeholder="Enter an resource, host or device name">
+                                    <input  name="resource"  type="text" class="form-control" id="tenantInfo"  placeholder="">
                                 </div>
                                 <div class="form-group">
                                     <label for="restAPIInfo">REST API</label>
-                                    <input name="tags"  type="text" class="form-control" id="restAPIInfo" aria-describedby="emailHelp" placeholder="Address of the REST API being used" title="This is the text of the tooltip">
+                                    <input name="tags"  type="text" class="form-control" id="restAPIInfo" aria-describedby="" placeholder="Address of the REST API being used" title="">
                                 </div>
+                                <div class="form-group">
+                                    <label for="swaggerRestAPIInfo">Swagger REST API Web</label>
+                                    <input name="tags"  type="text" class="form-control" id="swaggerRestAPIInfo" aria-describedby="" placeholder="Address of the Web based REST API" title="">
+                                </div>
+
                             </div>
 
                             <br>
@@ -395,6 +450,8 @@
     <script src="js/logscape.js"></script>
     <script src="js/backend.js"></script>
     <script src="js/explorer.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/search-backend.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/uploader.js"></script>
 

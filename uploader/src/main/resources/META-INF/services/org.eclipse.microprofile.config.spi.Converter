@@ -1,8 +1,9 @@
 # Note: run with quarkus:test will use fixtures quarkus:dev will use local services with remote storage
 # ./mvnw package -Pnative -Dquarkus.profile=prod-aws`
 # quarkus:prod - The default profile when not running in development or test mode
-com.liquidlabs.logscape.uploader.StorageFactoryConverter
-com.liquidlabs.logscape.uploader.QueryFactoryConverter
-com.liquidlabs.logscape.uploader.IndexingFactoryConverter
+com.liquidlabs.logscape.cloud.storage.StorageFactoryConverter
+com.liquidlabs.logscape.cloud.query.QueryFactoryConverter
+com.liquidlabs.logscape.cloud.search.SearchFactoryConverter
+com.liquidlabs.logscape.cloud.IndexingFactoryConverter
 
 

@@ -182,6 +182,6 @@ The output will display the API-Gateway URL for the front end
  
 ```
 Browser URL: https://3dwlmgnks6.execute-api.eu-west-2.amazonaws.com/Prod/query/id
-Response:    com.liquidlabs.logscape.uploader.QueryResource
+Response:    com.liquidlabs.logscape.cloud.query.QueryResource
 ```
 1. Configure the User interface URL to point to the API-Gateway address

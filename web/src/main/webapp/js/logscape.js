@@ -33,6 +33,7 @@ if (typeof Logscape == 'undefined') {
 
     Logscape = {
         Explorer: {},
+        Search: {},
 
         startOfWord: function (txt, end) {
             var i = end -1;

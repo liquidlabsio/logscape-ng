@@ -228,6 +228,5 @@ function binding () {
         $(".spinner").hide()
     })
 
-
 }
 

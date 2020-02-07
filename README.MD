@@ -1,6 +1,11 @@
 
 ![Image description](img/logscape-logo-hor.png)
 
+# What is the status?
+
+We have closed future development on this project and migrated to a new github repo 'precognito'. 
+It is bigger than just logs and searching for stuff ;) 
+
 # What is it?
 
 Cloud native, serverless log analysis runtime that uses the latest technologies to run at minimum cost on the Cloud. 

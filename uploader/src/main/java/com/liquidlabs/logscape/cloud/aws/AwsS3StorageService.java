@@ -96,12 +96,17 @@ public class AwsS3StorageService implements Storage {
         log.info("uploading:" + upload + " bucket:" + upload.getTenant());
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.addUserMetadata("tags", upload.getTags().toString());
+        objectMetadata.addUserMetadata("tags", upload.getTags());
         objectMetadata.addUserMetadata("tenant", upload.tenant);
         objectMetadata.addUserMetadata("length", "" + upload.fileContent.length);
 
+        upload.setStorageUrl(writeToS3(region, upload.fileContent, bucketName, filePath, objectMetadata));
 
-        File file = createTempFile(upload.fileContent);
+        return upload;
+    }
+
+    private String writeToS3(String region, byte[] fileContent, String bucketName, String filePath, ObjectMetadata objectMetadata) {
+        File file = createTempFile(fileContent);
         long contentLength = file.length();
         long partSize = 5 * 1024 * 1024; // Set part size to 5 MB.
 
@@ -126,7 +131,7 @@ public class AwsS3StorageService implements Storage {
 
             // Upload the file parts.
             long filePosition = 0;
-            for (int i = 1; filePosition < upload.fileContent.length; i++) {
+            for (int i = 1; filePosition < fileContent.length; i++) {
                 // Because the last part could be less than 5 MB, adjust the part size as needed.
                 partSize = Math.min(partSize, (contentLength - filePosition));
 
@@ -154,21 +159,20 @@ public class AwsS3StorageService implements Storage {
             CompleteMultipartUploadResult completeMultipartUploadResult = s3Client.completeMultipartUpload(compRequest);
 
 //            upload.storageUrl = completeMultipartUploadResult.getLocation();
-            upload.setStorageUrl(String.format("s3://%s/%s", bucketName, filePath));
+
 
         } catch (AmazonServiceException e) {
             // The call was transmitted successfully, but Amazon S3 couldn't process
             // it, so it returned an error response.
-            log.error("AmazonServiceException S3 Upload failed to process:{}", upload, e);
+            log.error("AmazonServiceException S3 Upload failed to process:{}", filePath, e);
         } catch (SdkClientException e) {
             // Amazon S3 couldn't be contacted for a response, or the client
             // couldn't parse the response from Amazon S3.
-            log.error("SdkClientException S3 not responding:{}", upload, e);
+            log.error("SdkClientException S3 not responding:{}", filePath, e);
         } finally {
             file.delete();
         }
-
-        return upload;
+        return String.format("s3://%s/%s", bucketName, filePath);
     }
 
     private String getBucketName(String tenant) {

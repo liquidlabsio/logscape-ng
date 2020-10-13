@@ -26,7 +26,7 @@
         <exec-maven-plugin.version>1.2.1</exec-maven-plugin.version>
         <maven.plugins.version>3.8.1</maven.plugins.version>
         <spotbugs.maven.plugin.version>3.1.12</spotbugs.maven.plugin.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
 
         <dynamodblocal.version>1.11.86</dynamodblocal.version>
         <dynamodblocal.repository.url>https://s3-us-west-2.amazonaws.com/dynamodb-local/release</dynamodblocal.repository.url>
